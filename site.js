@@ -15,6 +15,9 @@ var m=document.querySelectorAll('[data-u]');for(var i=0;i<m.length;i++){var u=m[
 set(L);
 })();
 
+// 방문자 집계(구글 애널리틱스)
+(function(){var id='G-CC8TZ9T7TV';var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);
+window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);})();
 // 공감·공유 (대표 지시 261023). 공감 수는 abacus.jasoncameron.dev 무료 카운터, 중복 공감은 브라우저에 기억
 (function(){var a=document.querySelector('.acts');if(!a)return;
 var id=a.getAttribute('data-id'),NS='https://abacus.jasoncameron.dev/',K='citizenenergynews/'+id,lk=a.querySelector('.like'),n=a.querySelector('.like b'),tst=a.querySelector('.toast');
