@@ -11,7 +11,11 @@ function set(l){L=l;document.documentElement.setAttribute('data-l',l);document.d
  var bs=document.querySelectorAll('#langs button');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].getAttribute('data-l')===l);
  var tt=document.querySelector('[data-title-'+l.toLowerCase()+']');if(tt)document.title=tt.getAttribute('data-title-'+l.toLowerCase());}
 document.addEventListener('click',function(e){var b=e.target.closest('#langs button');if(b)set(b.getAttribute('data-l'))});
-var m=document.querySelectorAll('[data-u]');for(var i=0;i<m.length;i++){var u=m[i].getAttribute('data-u')+'@'+m[i].getAttribute('data-d');m[i].href='mailto:'+u+'?subject='+encodeURIComponent('[시민에너지신문] 광고 문의 / Advertising inquiry')+'&body='+encodeURIComponent('회사명 / Company:\n담당자 / Contact person:\n연락처 / Phone·Email:\n광고 종류·기간 / Format & period:\n내용 / Details:\n');var s=m[i].querySelector('.addr');if(s)s.textContent=u;}
+// 광고 문의: 메일 프로그램이 없는 PC에서 mailto가 빈 창만 여는 문제 → Gmail 쓰기 창으로 열고, 주소 복사·메일 앱 단추를 함께 둔다 (261023)
+var m=document.querySelectorAll('[data-u]');for(var i=0;i<m.length;i++){var u=m[i].getAttribute('data-u')+'@'+m[i].getAttribute('data-d'),su='[시민에너지신문] 광고 문의 / Advertising inquiry',bo='회사명 / Company:\n담당자 / Contact person:\n연락처 / Phone·Email:\n광고 종류·기간 / Format & period:\n내용 / Details:\n';
+ m[i].href='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(u)+'&su='+encodeURIComponent(su)+'&body='+encodeURIComponent(bo);m[i].target='_blank';m[i].rel='noopener';
+ var w=m[i].parentNode;var s=w.querySelector('.addr');if(s)s.textContent=u;var mt=w.querySelector('.mailapp');if(mt)mt.href='mailto:'+u+'?subject='+encodeURIComponent(su)+'&body='+encodeURIComponent(bo);
+ var cp=w.querySelector('.copyaddr');if(cp)cp.addEventListener('click',function(){var ok=function(){cp.classList.add('on');setTimeout(function(){cp.classList.remove('on')},1500)};if(navigator.clipboard)navigator.clipboard.writeText(u).then(ok,function(){prompt('Email',u)});else prompt('Email',u)});}
 set(L);
 })();
 
