@@ -14,3 +14,5 @@ document.addEventListener('click',function(e){var b=e.target.closest('#langs but
 var m=document.querySelectorAll('[data-u]');for(var i=0;i<m.length;i++){var u=m[i].getAttribute('data-u')+'@'+m[i].getAttribute('data-d');m[i].href='mailto:'+u+'?subject='+encodeURIComponent('[시민에너지신문] 광고 문의 / Advertising inquiry')+'&body='+encodeURIComponent('회사명 / Company:\n담당자 / Contact person:\n연락처 / Phone·Email:\n광고 종류·기간 / Format & period:\n내용 / Details:\n');var s=m[i].querySelector('.addr');if(s)s.textContent=u;}
 set(L);
 })();
+(function(){var id='G-CC8TZ9T7TV';var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);
+window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);})();
