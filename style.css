@@ -159,14 +159,11 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .admail button,.admail .mailapp{font:inherit;font-size:13px;border:1px solid var(--line);background:none;border-radius:999px;padding:4px 10px;margin-left:6px;cursor:pointer;color:var(--ink2,#333);text-decoration:none}
 .admail button i{display:none;font-style:normal;margin-left:4px;color:var(--accent)}
 .admail button.on i{display:inline}
-/* 공감·공유 (대표 지시 261023) */
-.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin:28px 0 8px}
-.acts button,.acts a{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:14px;line-height:1;border:1px solid var(--line);background:var(--paper,#fff);color:var(--ink2,#333);border-radius:999px;padding:9px 14px;cursor:pointer;text-decoration:none}
-.acts button:hover,.acts a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-.acts .like{font-weight:700;padding:10px 18px}
-.acts .like .h{font-size:16px}
+/* 공감·공유: 제목 아래 줄 오른쪽 (대표 지시 261023) */
+.story-meta .acts{margin-left:auto;display:inline-flex;align-items:center;gap:6px}
+.acts button{display:inline-flex;align-items:center;gap:4px;font:inherit;font-size:13px;line-height:1;border:1px solid var(--line);background:none;color:var(--ink2,#333);border-radius:999px;padding:6px 11px;cursor:pointer}
+.acts button:hover{border-color:var(--accent);color:var(--accent)}
 .acts .like.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.acts .sep{flex-basis:100%;height:0}
-@media (min-width:700px){.acts .sep{flex-basis:auto;width:1px;height:22px;background:var(--line);margin:0 4px}}
-.acts .toast{font-size:13px;color:var(--accent);min-width:1em}
+.acts .like b{font-weight:700}
+.acts .toast{font-size:12px;color:var(--accent);white-space:nowrap}
 .badge{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:3px;padding:0 6px;color:var(--ink3);margin-left:6px;font-weight:400}
