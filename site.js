@@ -11,11 +11,6 @@ function set(l){L=l;document.documentElement.setAttribute('data-l',l);document.d
  var bs=document.querySelectorAll('#langs button');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].getAttribute('data-l')===l);
  var tt=document.querySelector('[data-title-'+l.toLowerCase()+']');if(tt)document.title=tt.getAttribute('data-title-'+l.toLowerCase());}
 document.addEventListener('click',function(e){var b=e.target.closest('#langs button');if(b)set(b.getAttribute('data-l'))});
-// 광고 문의: 메일 프로그램이 없는 PC에서 mailto가 빈 창만 여는 문제 → Gmail 쓰기 창으로 열고, 주소 복사·메일 앱 단추를 함께 둔다 (261023)
-var m=document.querySelectorAll('[data-u]');for(var i=0;i<m.length;i++){var u=m[i].getAttribute('data-u')+'@'+m[i].getAttribute('data-d'),su='[시민에너지신문] 광고 문의 / Advertising inquiry',bo='회사명 / Company:\n담당자 / Contact person:\n연락처 / Phone·Email:\n광고 종류·기간 / Format & period:\n내용 / Details:\n';
- m[i].href='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(u)+'&su='+encodeURIComponent(su)+'&body='+encodeURIComponent(bo);m[i].target='_blank';m[i].rel='noopener';
- var w=m[i].parentNode;var s=w.querySelector('.addr');if(s)s.textContent=u;var mt=w.querySelector('.mailapp');if(mt)mt.href='mailto:'+u+'?subject='+encodeURIComponent(su)+'&body='+encodeURIComponent(bo);
- var cp=w.querySelector('.copyaddr');if(cp)cp.addEventListener('click',function(){var ok=function(){cp.classList.add('on');setTimeout(function(){cp.classList.remove('on')},1500)};if(navigator.clipboard)navigator.clipboard.writeText(u).then(ok,function(){prompt('Email',u)});else prompt('Email',u)});}
 set(L);
 })();
 
@@ -29,7 +24,7 @@ var done=false;try{done=localStorage.getItem('sen-like-'+id)==='1'}catch(e){}
 function show(v){if(typeof v==='number')n.textContent=v}
 if(done)lk.classList.add('on');
 fetch(NS+'get/'+K).then(function(r){return r.json()}).then(function(j){show(j.value||0)}).catch(function(){});
-var MSG={KO:'링크를 복사했습니다',JA:'リンクをコピーしました',ZH:'链接已复制',EN:'Link copied'};
+var MSG={KO:'URL이 복사되었습니다.',JA:'URLをコピーしました。',ZH:'网址已复制。',EN:'URL copied.'};
 function lang(){return document.documentElement.getAttribute('data-l')||'KO'}
 function title(){var t=document.querySelector('[data-title-'+lang().toLowerCase()+']');return t?t.getAttribute('data-title-'+lang().toLowerCase()):document.title}
 function url(){return location.origin+location.pathname+'?lang='+lang().toLowerCase()}
@@ -37,7 +32,7 @@ a.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!
  if(t==='like'){e.preventDefault();if(done)return;done=true;lk.classList.add('on');try{localStorage.setItem('sen-like-'+id,'1')}catch(x){}
   n.textContent=(parseInt(n.textContent,10)||0)+1;fetch(NS+'hit/'+K).then(function(r){return r.json()}).then(function(j){show(j.value)}).catch(function(){});return}
  if(t==='share'){e.preventDefault();if(navigator.share){navigator.share({title:title(),url:url()}).catch(function(){})}else{t='copy'}}
- if(t==='copy'){e.preventDefault();var ok=function(){tst.textContent=MSG[lang()];setTimeout(function(){tst.textContent=''},2000)};
+ if(t==='copy'){e.preventDefault();var ok=function(){tst.textContent=MSG[lang()];setTimeout(function(){tst.textContent=''},2500)};
   if(navigator.clipboard)navigator.clipboard.writeText(url()).then(ok,function(){prompt('URL',url())});else prompt('URL',url());return}
  var W={fb:'https://www.facebook.com/sharer/sharer.php?u='+u,x:'https://twitter.com/intent/tweet?url='+u+'&text='+ti,line:'https://social-plugins.line.me/lineit/share?url='+u,weibo:'https://service.weibo.com/share/share.php?url='+u+'&title='+ti,band:'https://band.us/plugin/share?body='+ti+'%0A'+u+'&route='+u};
  if(W[t]){e.preventDefault();window.open(W[t],'_blank','noopener,width=600,height=560')}});
