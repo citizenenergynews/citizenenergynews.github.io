@@ -159,11 +159,12 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .admail button,.admail .mailapp{font:inherit;font-size:13px;border:1px solid var(--line);background:none;border-radius:999px;padding:4px 10px;margin-left:6px;cursor:pointer;color:var(--ink2,#333);text-decoration:none}
 .admail button i{display:none;font-style:normal;margin-left:4px;color:var(--accent)}
 .admail button.on i{display:inline}
-/* 공감·공유: 제목 아래 줄 오른쪽 (대표 지시 261023) */
-.story-meta .acts{margin-left:auto;display:inline-flex;align-items:center;gap:6px}
-.acts button{display:inline-flex;align-items:center;gap:4px;font:inherit;font-size:13px;line-height:1;border:1px solid var(--line);background:none;color:var(--ink2,#333);border-radius:999px;padding:6px 11px;cursor:pointer}
-.acts button:hover{border-color:var(--accent);color:var(--accent)}
-.acts .like.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.acts .like b{font-weight:700}
-.acts .toast{font-size:12px;color:var(--accent);white-space:nowrap}
+/* 공감·공유: 제목 아래 줄 오른쪽 끝, 사이트명과 같은 글자 크기, 줄 없음 (대표 지시 261023) */
+.story-meta{border-bottom:0;padding-bottom:0}
+.story-meta .acts{margin-left:auto;display:inline-flex;align-items:center;gap:12px;border:0;padding:0;margin-top:0;margin-bottom:0}
+.acts button{display:inline;font:inherit;font-size:14px;line-height:inherit;border:0;background:none;color:var(--ink3);padding:0;cursor:pointer}
+.acts button:hover{color:var(--accent)}
+.acts .like.on{color:var(--accent)}
+.acts .like .h{margin-right:3px}
+.acts .toast{font-size:14px;color:var(--accent);white-space:nowrap}
 .badge{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:3px;padding:0 6px;color:var(--ink3);margin-left:6px;font-weight:400}
