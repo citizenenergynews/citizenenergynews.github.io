@@ -14,5 +14,24 @@ document.addEventListener('click',function(e){var b=e.target.closest('#langs but
 var m=document.querySelectorAll('[data-u]');for(var i=0;i<m.length;i++){var u=m[i].getAttribute('data-u')+'@'+m[i].getAttribute('data-d');m[i].href='mailto:'+u+'?subject='+encodeURIComponent('[시민에너지신문] 광고 문의 / Advertising inquiry')+'&body='+encodeURIComponent('회사명 / Company:\n담당자 / Contact person:\n연락처 / Phone·Email:\n광고 종류·기간 / Format & period:\n내용 / Details:\n');var s=m[i].querySelector('.addr');if(s)s.textContent=u;}
 set(L);
 })();
-(function(){var id='G-CC8TZ9T7TV';var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);
-window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);})();
+
+// 공감·공유 (대표 지시 261023). 공감 수는 abacus.jasoncameron.dev 무료 카운터, 중복 공감은 브라우저에 기억
+(function(){var a=document.querySelector('.acts');if(!a)return;
+var id=a.getAttribute('data-id'),NS='https://abacus.jasoncameron.dev/',K='citizenenergynews/'+id,lk=a.querySelector('.like'),n=a.querySelector('.like b'),tst=a.querySelector('.toast');
+var done=false;try{done=localStorage.getItem('sen-like-'+id)==='1'}catch(e){}
+function show(v){if(typeof v==='number')n.textContent=v}
+if(done)lk.classList.add('on');
+fetch(NS+'get/'+K).then(function(r){return r.json()}).then(function(j){show(j.value||0)}).catch(function(){});
+var MSG={KO:'링크를 복사했습니다',JA:'リンクをコピーしました',ZH:'链接已复制',EN:'Link copied'};
+function lang(){return document.documentElement.getAttribute('data-l')||'KO'}
+function title(){var t=document.querySelector('[data-title-'+lang().toLowerCase()+']');return t?t.getAttribute('data-title-'+lang().toLowerCase()):document.title}
+function url(){return location.origin+location.pathname+'?lang='+lang().toLowerCase()}
+a.addEventListener('click',function(e){var b=e.target.closest('[data-act]');if(!b)return;var t=b.getAttribute('data-act'),u=encodeURIComponent(url()),ti=encodeURIComponent(title());
+ if(t==='like'){e.preventDefault();if(done)return;done=true;lk.classList.add('on');try{localStorage.setItem('sen-like-'+id,'1')}catch(x){}
+  n.textContent=(parseInt(n.textContent,10)||0)+1;fetch(NS+'hit/'+K).then(function(r){return r.json()}).then(function(j){show(j.value)}).catch(function(){});return}
+ if(t==='share'){e.preventDefault();if(navigator.share){navigator.share({title:title(),url:url()}).catch(function(){})}else{t='copy'}}
+ if(t==='copy'){e.preventDefault();var ok=function(){tst.textContent=MSG[lang()];setTimeout(function(){tst.textContent=''},2000)};
+  if(navigator.clipboard)navigator.clipboard.writeText(url()).then(ok,function(){prompt('URL',url())});else prompt('URL',url());return}
+ var W={fb:'https://www.facebook.com/sharer/sharer.php?u='+u,x:'https://twitter.com/intent/tweet?url='+u+'&text='+ti,line:'https://social-plugins.line.me/lineit/share?url='+u,weibo:'https://service.weibo.com/share/share.php?url='+u+'&title='+ti,band:'https://band.us/plugin/share?body='+ti+'%0A'+u+'&route='+u};
+ if(W[t]){e.preventDefault();window.open(W[t],'_blank','noopener,width=600,height=560')}});
+})();
