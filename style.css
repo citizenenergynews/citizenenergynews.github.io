@@ -142,6 +142,13 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .top3{grid-template-columns:2fr 1fr 1fr}
 .lead{text-align:left}
 .lead p{margin:0}
+/* 메인 아래 빈자리를 다른 뉴스로 채움 (대표 지시 261023) */
+.leadmore{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--line)}
+.leadmore li{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.leadmore .th{flex:0 0 120px;aspect-ratio:3/2;overflow:hidden;background:var(--soft)}
+.leadmore .th img{width:100%;height:100%;object-fit:cover}
+.leadmore .kick{margin:0 0 2px}
+.leadmore a.t{font-family:var(--serif);font-weight:700;font-size:17px;line-height:1.4}
 @media (max-width:900px){.top3{grid-template-columns:1fr}}
 .adlink{margin-left:12px;color:var(--accent);font-weight:700}
 .adslot{display:block;border:1px dashed var(--line);background:var(--soft);color:var(--ink3);text-align:center;padding:22px 16px;margin:20px 0;font-size:14px}
