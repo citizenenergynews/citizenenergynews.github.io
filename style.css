@@ -127,9 +127,14 @@ html[data-l=ZH] .ml-zh,html[data-l=EN] .ml-en{display:block}
 
 /* GitHub Pages 추가 */
 .ml-ko,.ml-zh,.ml-en{}
-span.ml-zh,span.ml-en{display:none}
-html[data-l=ZH] span.ml-ko,html[data-l=EN] span.ml-ko{display:none}
-html[data-l=ZH] span.ml-zh,html[data-l=EN] span.ml-en{display:inline}
+span.ml-ja,span.ml-zh,span.ml-en{display:none}
+html[data-l=JA] span.ml-ko,html[data-l=ZH] span.ml-ko,html[data-l=EN] span.ml-ko{display:none}
+html[data-l=JA] span.ml-ja,html[data-l=ZH] span.ml-zh,html[data-l=EN] span.ml-en{display:inline}
+div.ml-ja{display:none}
+html[data-l=JA] div.ml-ko{display:none}
+html[data-l=JA] div.ml-ja{display:block}
+html[lang=ja] body{font-family:'Noto Sans JP',var(--sans)}
+html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',var(--serif)}
 .story-body .view{background:var(--soft);border-left:4px solid var(--accent);padding:14px 18px;margin:28px 0 0}
 .story-body .view h2{margin:0 0 .5em;font-size:18px;color:var(--accent)}
 .story-body .view p:last-child{margin-bottom:0}
