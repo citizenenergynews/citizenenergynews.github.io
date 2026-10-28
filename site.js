@@ -40,7 +40,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   function fill(){
     var t=document.querySelector('.ml-ko .top3'); if(!t) return;
     var l=t.querySelector('.col-l'), c=t.querySelector('.col-c'); if(!l||!c||l.querySelector('.card.extra')) return;
-    if(c.offsetHeight-l.offsetHeight<260) return;
+    var lc=l.lastElementChild; if(!lc||c.getBoundingClientRect().bottom-lc.getBoundingClientRect().bottom<260) return;
     var used={}; t.querySelectorAll('a[href]').forEach(function(a){used[a.getAttribute('href')]=1});
     var pick=null, kick='';
     document.querySelectorAll('.ml-ko .secs .sec').forEach(function(s){
