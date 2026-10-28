@@ -176,3 +176,14 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .acts .toast{font-size:14px;color:var(--accent);white-space:nowrap}
 .story-meta .byline{margin-left:6px}
 .badge{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:3px;padding:0 6px;color:var(--ink3);margin-left:6px;font-weight:400}
+
+/* 261029 첫화면: 오른쪽 목록 아래로, 큰 기사 넓게, 글자 줄이기 */
+.top3{grid-template-columns:2fr 1fr}
+.top3 .col-r{grid-column:1/-1;border-top:2px solid var(--line2);padding-top:14px}
+.col-r ul{display:grid;grid-template-columns:repeat(3,1fr);gap:0 28px}
+.col-r li,.col-r li:first-child{padding:10px 0;border-top:0!important;border-bottom:1px solid var(--line)}
+.col-r li a{font-size:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card p,.sec .first p{display:none}
+.lead p{-webkit-line-clamp:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+.card h3 a,.leadmore a.t,.sec li a{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:900px){.top3{grid-template-columns:1fr}.col-r ul{grid-template-columns:1fr}}
