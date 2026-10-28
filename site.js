@@ -34,3 +34,28 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
  if(t==='copy'){var ts=a.querySelector('.toast'),ok=function(){ts.textContent=MSG[lang()];setTimeout(function(){ts.textContent=''},2500)};
   if(navigator.clipboard)navigator.clipboard.writeText(url()).then(ok,function(){prompt('URL',url())});else prompt('URL',url())}});
 })();
+
+/* 261029 첫화면: 왼쪽 큰기사 옆 빈칸에 사진 기사 하나 더 */
+(function(){
+  function fill(){
+    var t=document.querySelector('.ml-ko .top3'); if(!t) return;
+    var l=t.querySelector('.col-l'), c=t.querySelector('.col-c'); if(!l||!c||l.querySelector('.card.extra')) return;
+    if(c.offsetHeight-l.offsetHeight<260) return;
+    var used={}; t.querySelectorAll('a[href]').forEach(function(a){used[a.getAttribute('href')]=1});
+    var pick=null, kick='';
+    document.querySelectorAll('.ml-ko .secs .sec').forEach(function(s){
+      if(pick) return;
+      s.querySelectorAll('h5 a, li a').forEach(function(a){
+        var h=a.getAttribute('href'); if(!pick&&h&&h.indexOf('a/')===0&&!used[h]){pick=a;kick=(s.querySelector('h4').firstChild.textContent||'').trim();}
+      });
+    });
+    if(!pick) return;
+    var h=pick.getAttribute('href'), d=document.createElement('div'); d.className='card extra';
+    d.innerHTML='<div class="ph"><img src="'+h+'photo.jpg" alt="" loading="lazy"></div><div class="kick"></div><h3><a></a></h3>';
+    d.querySelector('img').onerror=function(){this.parentNode.remove()};
+    d.querySelector('.kick').textContent=kick; var a=d.querySelector('h3 a'); a.href=h; a.textContent=pick.textContent;
+    l.appendChild(d);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fill); else fill();
+  window.addEventListener('load',fill);
+})();
