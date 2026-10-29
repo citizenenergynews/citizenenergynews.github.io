@@ -70,3 +70,15 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var a=document.createElement('a');a.className='adlink';a.href=base+'help/';a.innerHTML=T;ad.parentNode.insertBefore(a,ad.nextSibling);
   var f=document.querySelector('.foot .wrap');if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href=base+'help/';b.innerHTML=T;f.appendChild(b);}
 })();
+
+/* 261029 광고문의 화면에도 고객센터 왼쪽 메뉴 (ad/는 생성기가 다시 만들어서 여기서 넣음) */
+(function(){
+  var pg=document.querySelector('main .adpage');if(!pg||pg.classList.contains('helppage')||document.querySelector('.helpnav'))return;
+  if(!/\/ad\/?(index\.html)?$/.test(location.pathname))return;
+  function ml(k,j,z,e){return '<span class="ml-ko">'+k+'</span><span class="ml-ja">'+j+'</span><span class="ml-zh">'+z+'</span><span class="ml-en">'+e+'</span>'}
+  var M=[['help/',ml('고객센터 안내','カスタマーセンター','客服中心','Help Center'),''],['help/reporters/',ml('기자 소개','記者紹介','记者介绍','Our Reporters'),''],['ad/',ml('광고문의','広告のお問い合わせ','广告咨询','Advertising'),'on'],['help/partner/',ml('제휴문의','提携のお問い合わせ','合作咨询','Partnerships'),''],['help/copyright/',ml('저작권문의','著作権のお問い合わせ','版权咨询','Copyright'),''],['help/rules/',ml('보도준칙','報道準則','报道准则','Reporting Guidelines'),''],['help/press-ethics/',ml('언론윤리강령','言論倫理綱領','新闻伦理纲领','Press Code of Ethics'),'sub'],['help/reporter-ethics/',ml('기자윤리강령','記者倫理綱領','记者伦理纲领',"Journalists' Code of Ethics"),'sub']];
+  var h='<strong>'+ml('고객센터','カスタマーセンター','客服中心','Help Center')+'</strong><ul>';
+  for(var i=0;i<M.length;i++)h+='<li'+(M[i][2]?' class="'+M[i][2]+'"':'')+'><a href="../'+M[i][0]+'">'+M[i][1]+'</a></li>';
+  var nav=document.createElement('nav');nav.className='helpnav';nav.innerHTML=h+'</ul>';
+  var w=document.createElement('div');w.className='helpwrap';pg.parentNode.insertBefore(w,pg);w.appendChild(nav);w.appendChild(pg);pg.classList.add('helppage');
+})();
