@@ -85,3 +85,9 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var nav=document.createElement('nav');nav.className='helpnav';nav.innerHTML=h+'</ul>';
   var w=document.createElement('div');w.className='helpwrap';pg.parentNode.insertBefore(w,pg);w.appendChild(nav);w.appendChild(pg);pg.classList.add('helppage');
 })();
+/* 261029 광고 링크 이름 = 광고문의 (생성기 글자는 광고·제휴 문의) */
+(function(){
+  var T={'ml-ko':'광고문의','ml-ja':'広告のお問い合わせ','ml-zh':'广告咨询','ml-en':'Advertising'};
+  var a=document.querySelectorAll('a[href$="ad/"]');
+  for(var i=0;i<a.length;i++)for(var c in T){var s=a[i].querySelector('.'+c);if(s)s.textContent=T[c]}
+})();
