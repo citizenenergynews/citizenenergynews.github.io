@@ -61,3 +61,12 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   }
   if(document.readyState==='complete') fill(); else window.addEventListener('load',fill);
 })();
+
+/* 261029 고객센터: 위 띠·맨 아래에 링크 (HTML을 다시 만들어도 남도록 여기서 넣음) */
+(function(){
+  var ad=document.querySelector('.topbar .adlink');if(!ad)return;
+  var base=ad.getAttribute('href').replace(/ad\/?$/,'');
+  var T='<span class="ml-ko">고객센터</span><span class="ml-ja">カスタマーセンター</span><span class="ml-zh">客服中心</span><span class="ml-en">Help Center</span>';
+  var a=document.createElement('a');a.className='adlink';a.href=base+'help/';a.innerHTML=T;ad.parentNode.insertBefore(a,ad.nextSibling);
+  var f=document.querySelector('.foot .wrap');if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href=base+'help/';b.innerHTML=T;f.appendChild(b);}
+})();

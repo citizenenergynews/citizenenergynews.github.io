@@ -192,3 +192,26 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .lead h2{margin:4px 0 6px}
 .nav ul{justify-content:space-between}
 @media (max-width:900px){.top3{grid-template-columns:1fr}.col-r ul{grid-template-columns:1fr}}
+
+/* 261029 고객센터: 왼쪽 메뉴 + 본문 */
+.helpwrap{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start;padding-top:32px}
+.helpnav{position:sticky;top:16px;border-top:2px solid var(--line2)}
+.helpnav strong{display:block;font-family:var(--serif);font-size:20px;padding:12px 0 8px}
+.helpnav ul{list-style:none;margin:0;padding:0}
+.helpnav li a{display:block;padding:9px 4px;border-bottom:1px solid var(--line);color:var(--ink2,#333);font-size:15px}
+.helpnav li.sub a{padding-left:18px;font-size:14px}
+.helpnav li.sub a:before{content:'└ ';color:var(--ink3)}
+.helpnav li.on a{color:var(--accent);font-weight:700}
+.helppage{margin:0;max-width:none;padding-top:0}
+.helppage h2{font-size:20px;margin:28px 0 8px}
+.helppage h2.codehead{font-family:var(--serif);font-size:22px;border-top:2px solid var(--line2);padding-top:18px;margin-top:36px}
+.helppage h3{font-size:17px;margin:20px 0 4px}
+.helppage ul,.helppage ol{padding-left:22px}
+.helpnote{font-size:14px;color:var(--ink3)}
+.helpcards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0}
+.helpcards a{display:block;border:1px solid var(--line);border-radius:6px;padding:14px 16px;color:inherit}
+.helpcards a:hover{border-color:var(--accent);text-decoration:none}
+.helpcards b{display:block;font-size:17px;color:var(--accent)}
+.helpcards span{font-size:14px;color:var(--ink3);line-height:1.5}
+.helpcards a.sub{margin-left:0}
+@media (max-width:760px){.helpwrap{grid-template-columns:1fr;gap:8px;padding-top:16px}.helpnav{position:static}.helpcards{grid-template-columns:1fr}}
