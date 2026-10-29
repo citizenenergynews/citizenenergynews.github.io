@@ -55,10 +55,9 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
     d.querySelector('img').onerror=function(){this.parentNode.remove()};
     d.querySelector('.kick').textContent=kick; var a=d.querySelector('h3 a'); a.href=h; a.textContent=pick.textContent;
     l.appendChild(d);
-    var over=function(){return d.getBoundingClientRect().bottom>c.lastElementChild.getBoundingClientRect().bottom+20};
-    if(over()){var p=d.querySelector('.ph'); if(p) p.remove();}
-    if(over()) d.remove();
+    var cb=c.lastElementChild.getBoundingClientRect().bottom, p=d.querySelector('.ph');
+    if(p){var hh=p.offsetHeight+(cb-d.getBoundingClientRect().bottom)+16; if(hh>=110){p.style.aspectRatio='auto';p.style.height=hh+'px'}else p.remove();}
+    if(d.getBoundingClientRect().bottom>cb+20) d.remove();
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fill); else fill();
-  window.addEventListener('load',fill);
+  if(document.readyState==='complete') fill(); else window.addEventListener('load',fill);
 })();
