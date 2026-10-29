@@ -140,3 +140,11 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   d.textContent='발행인 김재호 · 편집인 김대오 · 청소년보호책임자 김대오 · 주소 부산광역시 사하구 하신중앙로 180, 103동 1302호';
   var s=w.querySelector('strong');w.insertBefore(d,s?s.nextSibling:w.firstChild);
 })();
+/* 261029 인터넷신문 등록 전 기사 숨김 — 등록 나오면 HIDE=false 로 바꾸면 그대로 되돌아옴 */
+(function(){
+  var HIDE=true;if(!HIDE)return;
+  if(/\/(help|privacy|ad|sec)\//.test(location.pathname))return;
+  var m=document.querySelector('main');if(!m)return;
+  var r=document.createElement('meta');r.name='robots';r.content='noindex';document.head.appendChild(r);
+  m.innerHTML='<div class="prep"><p>시민에너지신문은 인터넷신문 등록 준비 중입니다.<br>등록 후 기사를 다시 공개합니다.</p><p lang="en">Citizen Energy News is preparing its registration as an internet newspaper. Articles will be available again soon.</p></div>';
+})();
