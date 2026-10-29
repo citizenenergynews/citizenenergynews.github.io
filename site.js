@@ -120,3 +120,16 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
     }
   });
 })();
+/* 261029 사진 + 제목 = 한 기사: 사진을 눌러도 그 기사로 (생성기 HTML은 사진에 링크가 없어서 여기서 연결) */
+(function(){
+  function link(img){
+    if(img.closest('a,.story,.helppage'))return null;
+    for(var p=img.parentNode,i=0;p&&i<3;p=p.parentNode,i++){var a=p.querySelector('h2 a[href],h3 a[href],h4 a[href]');if(a)return a}
+    return null;
+  }
+  var css=document.createElement('style');css.textContent='main .ph img{cursor:pointer}';document.head.appendChild(css);
+  document.addEventListener('click',function(e){
+    if(e.target.tagName!=='IMG')return;var a=link(e.target);if(!a)return;
+    if(e.ctrlKey||e.metaKey||e.button===1)window.open(a.href);else location.href=a.href;
+  });
+})();
