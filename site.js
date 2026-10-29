@@ -91,3 +91,11 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var a=document.querySelectorAll('a[href$="ad/"]');
   for(var i=0;i<a.length;i++)for(var c in T){var s=a[i].querySelector('.'+c);if(s)s.textContent=T[c]}
 })();
+/* 261029 기사 바이라인 = AI 기자 김기자 (생성기 글자는 시민에너지신문) → 기자 소개로 연결 */
+(function(){
+  var ad=document.querySelector('.topbar .adlink');if(!ad)return;
+  var base=ad.getAttribute('href').replace(/ad\/?$/,'');
+  var T={'ml-ko':'AI 기자 김기자','ml-ja':'AI記者 キム記者','ml-zh':'AI记者 金记者','ml-en':'AI Reporter Kim'};
+  for(var c in T){var m=document.querySelectorAll('.story .'+c+' .story-meta > span:first-child');
+    for(var i=0;i<m.length;i++){if(m[i].classList.contains('acts'))continue;m[i].innerHTML='<a class="byline" href="'+base+'help/reporters/"></a>';m[i].firstChild.textContent=T[c];}}
+})();
