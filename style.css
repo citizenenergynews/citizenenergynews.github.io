@@ -232,3 +232,4 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .rcard .rph{overflow:hidden}.rcard .rph img{width:100%;height:100%;object-fit:cover}
 /* 261029 기사 사진 화사하게 */
 main img{filter:brightness(1.08) saturate(1.12) contrast(1.02)}
+.foot .legal{margin:4px 0 8px;line-height:1.6;word-break:keep-all}

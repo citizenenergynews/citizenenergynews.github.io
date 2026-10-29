@@ -133,3 +133,10 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
     if(e.ctrlKey||e.metaKey||e.button===1)window.open(a.href);else location.href=a.href;
   });
 })();
+/* 261029 법정 표기(신문법): 발행인·편집인·청소년보호책임자·주소 — 등록번호·등록일·전화는 등록 후 추가 */
+(function(){
+  var w=document.querySelector('.foot .wrap');if(!w)return;
+  var d=document.createElement('div');d.className='legal';
+  d.textContent='발행인 김재호 · 편집인 김대오 · 청소년보호책임자 김대오 · 주소 부산광역시 사하구 하신중앙로 180, 103동 1302호';
+  var s=w.querySelector('strong');w.insertBefore(d,s?s.nextSibling:w.firstChild);
+})();
