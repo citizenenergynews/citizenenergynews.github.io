@@ -99,3 +99,24 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   for(var c in T){var m=document.querySelectorAll('.story .'+c+' .story-meta > span:first-child');
     for(var i=0;i<m.length;i++){if(m[i].classList.contains('acts'))continue;m[i].innerHTML='<a class="byline" href="'+base+'help/reporters/"></a>';m[i].firstChild.textContent=T[c];}}
 })();
+/* 261029 문체 담당 기자: help/reporters/mentors.json에서 그림 (withdrawn 날부터 빠짐) */
+(function(){
+  var box=document.querySelectorAll('[data-mentors]');if(!box.length)return;
+  var today=new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
+  var E={'ml-ko':['문체 담당 기자','준비 중입니다.'],'ml-ja':['文体担当記者','準備中です。'],'ml-zh':['文风指导记者','准备中。'],'ml-en':['Style mentor','Coming soon.']};
+  fetch('mentors.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){
+    var on=(d.mentors||[]).filter(function(m){return m.posted&&m.posted<=today&&!(m.withdrawn&&m.withdrawn<=today)});
+    for(var i=0;i<box.length;i++){
+      var lg=box[i].closest('[class^="ml-"]').className.split(' ')[0],e=E[lg]||E['ml-ko'];
+      if(!on.length){box[i].outerHTML='<p>'+e[1]+'</p>';continue}
+      on.forEach(function(m){
+        var c=document.createElement('div');c.className='rcard';
+        c.innerHTML='<div class="rph"></div><em></em><b></b><ul class="rcv"></ul>';
+        if(m.photo){var im=document.createElement('img');im.src='img/'+m.photo;im.alt='';c.firstChild.appendChild(im)}
+        c.querySelector('em').textContent=e[0];c.querySelector('b').textContent=m.name;
+        (m.cv||[]).forEach(function(x){var li=document.createElement('li');li.textContent=x;c.querySelector('ul').appendChild(li)});
+        box[i].appendChild(c);
+      });
+    }
+  });
+})();
