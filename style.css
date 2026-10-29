@@ -215,3 +215,9 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .helpcards span{font-size:14px;color:var(--ink3);line-height:1.5}
 .helpcards a.sub{margin-left:0}
 @media (max-width:760px){.helpwrap{grid-template-columns:1fr;gap:8px;padding-top:16px}.helpnav{position:static}.helpcards{grid-template-columns:1fr}}
+.reporters{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+.rcard{border:1px solid var(--line);border-radius:6px;padding:18px;text-align:center}
+.rcard .rph{width:96px;height:96px;border-radius:50%;background:var(--line);margin:0 auto 12px}
+.rcard b{display:block;font-size:17px}
+.rcard span{font-size:14px;color:var(--ink3)}
+@media (max-width:760px){.reporters{grid-template-columns:1fr}}
