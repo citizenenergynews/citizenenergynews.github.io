@@ -142,11 +142,24 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 })();
 /* 261029 인터넷신문 등록 전 기사 숨김 — 등록 나오면 HIDE=false 로 바꾸면 그대로 되돌아옴 */
 (function(){
-  var HIDE=true;if(!HIDE)return;
+  var HIDE=false;/* 261102 대표 지시: 첫화면·기사 다시 공개 + 시험 운영 안내창(아래) */if(!HIDE)return;
   if(/\/(help|privacy|ad|sec)\//.test(location.pathname))return;
   var r=document.createElement('meta');r.name='robots';r.content='noindex';document.head.appendChild(r);
   /* 261102 대표 지시: 기사 링크(/a/…)로 직접 들어오면 기사는 보이게 — 첫화면·목록만 숨김 */
   if(/\/a\/[^\/]+/.test(location.pathname))return;
   var m=document.querySelector('main');if(!m)return;
   m.innerHTML='<div class="prep"><p>시민에너지신문은 인터넷신문 등록 준비 중입니다.<br>등록 후 기사를 다시 공개합니다.</p><p lang="en">Citizen Energy News is preparing its registration as an internet newspaper. Articles will be available again soon.</p></div>';
+})();
+/* 261102 대표 지시: 시험 운영 안내창 — 등록 나오면 TEST=false */
+(function(){
+  var TEST=true;if(!TEST)return;
+  if(/\/(help|privacy|ad|sec)\//.test(location.pathname))return;
+  try{if(sessionStorage.getItem('cenTest'))return}catch(e){}
+  var c=document.createElement('style');c.textContent='.cen-test{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}.cen-test div{background:#fff;color:#222;max-width:420px;border-radius:10px;padding:22px 20px;line-height:1.6;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.cen-test b{display:block;font-size:18px;margin-bottom:8px}.cen-test small{display:block;color:#666;margin-top:8px}.cen-test button{margin-top:14px;width:100%;padding:10px;border:0;border-radius:6px;background:#1f6f43;color:#fff;font-size:15px;cursor:pointer}';
+  document.head.appendChild(c);
+  var o=document.createElement('div');o.className='cen-test';
+  o.innerHTML='<div role="dialog" aria-modal="true"><b>시험 운영 중입니다</b>시민에너지신문은 인터넷신문 등록을 신청 중이며, 지금은 정식 창간 전 시험 운영 기간입니다. 기사 내용은 바뀔 수 있습니다.<small>試験運用中です · 试运行中 · Trial operation — registration pending</small><button type="button">확인</button></div>';
+  function close(){o.remove();try{sessionStorage.setItem('cenTest','1')}catch(e){}}
+  o.querySelector('button').onclick=close;o.onclick=function(e){if(e.target===o)close()};
+  document.body.appendChild(o);
 })();
