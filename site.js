@@ -144,7 +144,9 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 (function(){
   var HIDE=true;if(!HIDE)return;
   if(/\/(help|privacy|ad|sec)\//.test(location.pathname))return;
-  var m=document.querySelector('main');if(!m)return;
   var r=document.createElement('meta');r.name='robots';r.content='noindex';document.head.appendChild(r);
+  /* 261102 대표 지시: 기사 링크(/a/…)로 직접 들어오면 기사는 보이게 — 첫화면·목록만 숨김 */
+  if(/\/a\/[^\/]+/.test(location.pathname))return;
+  var m=document.querySelector('main');if(!m)return;
   m.innerHTML='<div class="prep"><p>시민에너지신문은 인터넷신문 등록 준비 중입니다.<br>등록 후 기사를 다시 공개합니다.</p><p lang="en">Citizen Energy News is preparing its registration as an internet newspaper. Articles will be available again soon.</p></div>';
 })();
