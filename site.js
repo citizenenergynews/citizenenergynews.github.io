@@ -185,7 +185,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   o.querySelector('button').onclick=close;o.onclick=function(e){if(e.target===o)close()};
   document.body.appendChild(o);
 })();
-/* 261106 대표 지시: 기사 검색·최신 기사 줄·기사제보 (search.json = 생성기가 만듦, help/tip/ = 김재호 관리) */
+/* 261106 대표 지시: 기사 검색·최신 기사 줄·기사제보(누르면 바로 구글폼) (search.json = 생성기가 만듦, help/tip/ = 김재호 관리) */
 (function(){
   var me=document.querySelector('script[src*="site.js"]');if(!me)return;
   var src=me.getAttribute('src'),base=src.replace(/site\.js.*$/,''),ver=(src.split('v=')[1]||'');
@@ -210,11 +210,11 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var ad=document.querySelector('.topbar .adlink');
   if(ad){
     var s=document.createElement('a');s.className='adlink';s.href='#';s.innerHTML=ml('검색','検索','搜索','Search');ad.parentNode.insertBefore(s,ad);
-    var t=document.createElement('a');t.className='adlink';t.href=base+'help/tip/';t.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');ad.parentNode.insertBefore(t,ad);
+    var t=document.createElement('a');t.className='adlink';t.href='https://docs.google.com/forms/d/e/1FAIpQLSfmD1UmAwErXru4BHybowZTTHaM6JYe-ZCpUG8xjVyhc6ycPQ/viewform';t.target='_blank';t.rel='noopener';t.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');ad.parentNode.insertBefore(t,ad);
     s.addEventListener('click',function(e){e.preventDefault();open()});
   }
   var f=document.querySelector('.foot .wrap');
-  if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href=base+'help/tip/';b.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');f.appendChild(b)}
+  if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href='https://docs.google.com/forms/d/e/1FAIpQLSfmD1UmAwErXru4BHybowZTTHaM6JYe-ZCpUG8xjVyhc6ycPQ/viewform';b.target='_blank';b.rel='noopener';b.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');f.appendChild(b)}
   /* 검색 창 */
   var PH={ko:'기사 제목·부제로 찾기',ja:'記事のタイトルで検索',zh:'按标题搜索',en:'Search headlines'};
   var NO={ko:'찾는 기사가 없습니다.',ja:'該当する記事はありません。',zh:'没有找到相关文章。',en:'No matching articles.'};
