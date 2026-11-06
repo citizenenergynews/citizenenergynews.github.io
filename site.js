@@ -152,10 +152,10 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 })();
 /* 261102 대표 지시: 테스트 기간 — 첫화면 메인 기사 2개(큰기사+왼쪽 첫 기사)만 보이고 나머지 숨김. 기사 쪽도 그 2개만. 끝나면 ONLY2=false */
 (function(){
-  var ONLY2=false;/* 261106 대표 지시: 숨긴 기사 전부 공개 */if(!ONLY2)return;
+  var ONLY2=true;/* 261106 대표 지시: 숨긴 기사 전부 공개 → 같은 날 다시 가림 */if(!ONLY2)return;
   if(/\/(help|privacy|ad)\//.test(location.pathname))return;
   var css=document.createElement('style');
-  css.textContent='.front .leadmore,.front .col-l .card~.card,.front .col-r,main .secs{display:none!important}';
+  css.textContent='.front .leadmore,.front .col-l .card~.card,.front .col-r,main .secs,.cen-tk,.topbar .cen-srch{display:none!important}';
   document.head.appendChild(css);
   function keep(doc){var a=[],l=doc.querySelector('.front .lead h2 a'),c=doc.querySelector('.front .col-l .card h3 a');if(l)a.push(l.getAttribute('href'));if(c)a.push(c.getAttribute('href'));return a.map(function(h){return h.replace(/^\.?\/?/,'').replace(/\/?$/,'/')})}
   var root=location.origin+'/';
@@ -209,7 +209,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   /* 위 띠 링크: 검색 · 기사제보 */
   var ad=document.querySelector('.topbar .adlink');
   if(ad){
-    var s=document.createElement('a');s.className='adlink';s.href='#';s.innerHTML=ml('검색','検索','搜索','Search');ad.parentNode.insertBefore(s,ad);
+    var s=document.createElement('a');s.className='adlink cen-srch';s.href='#';s.innerHTML=ml('검색','検索','搜索','Search');ad.parentNode.insertBefore(s,ad);
     var t=document.createElement('a');t.className='adlink';t.href='https://docs.google.com/forms/d/e/1FAIpQLSfmD1UmAwErXru4BHybowZTTHaM6JYe-ZCpUG8xjVyhc6ycPQ/viewform';t.target='_blank';t.rel='noopener';t.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');ad.parentNode.insertBefore(t,ad);
     s.addEventListener('click',function(e){e.preventDefault();open()});
   }
