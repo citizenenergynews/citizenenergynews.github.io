@@ -76,7 +76,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var pg=document.querySelector('main .adpage');if(!pg||pg.classList.contains('helppage')||document.querySelector('.helpnav'))return;
   if(!/\/ad\/?(index\.html)?$/.test(location.pathname))return;
   function ml(k,j,z,e){return '<span class="ml-ko">'+k+'</span><span class="ml-ja">'+j+'</span><span class="ml-zh">'+z+'</span><span class="ml-en">'+e+'</span>'}
-  var M=[['help/',ml('고객센터 안내','カスタマーセンター','客服中心','Help Center'),''],['help/reporters/',ml('기자 소개','記者紹介','记者介绍','Our Reporters'),''],['ad/',ml('광고문의','広告のお問い合わせ','广告咨询','Advertising'),'on'],['help/partner/',ml('제휴문의','提携のお問い合わせ','合作咨询','Partnerships'),''],['help/copyright/',ml('저작권문의','著作権のお問い合わせ','版权咨询','Copyright'),''],['help/rules/',ml('보도준칙','報道準則','报道准则','Reporting Guidelines'),''],['help/press-ethics/',ml('언론윤리강령','言論倫理綱領','新闻伦理纲领','Press Code of Ethics'),'sub'],['help/reporter-ethics/',ml('기자윤리강령','記者倫理綱領','记者伦理纲领',"Journalists' Code of Ethics"),'sub']];
+  var M=[['help/',ml('고객센터 안내','カスタマーセンター','客服中心','Help Center'),''],['help/reporters/',ml('기자 소개','記者紹介','记者介绍','Our Reporters'),''],['ad/',ml('광고문의','広告のお問い合わせ','广告咨询','Advertising'),'on'],['help/partner/',ml('제휴문의','提携のお問い合わせ','合作咨询','Partnerships'),''],['help/tip/',ml('기사제보','情報提供','新闻爆料','News Tips'),''],['help/copyright/',ml('저작권문의','著作権のお問い合わせ','版权咨询','Copyright'),''],['help/rules/',ml('보도준칙','報道準則','报道准则','Reporting Guidelines'),''],['help/press-ethics/',ml('언론윤리강령','言論倫理綱領','新闻伦理纲领','Press Code of Ethics'),'sub'],['help/reporter-ethics/',ml('기자윤리강령','記者倫理綱領','记者伦理纲领',"Journalists' Code of Ethics"),'sub']];
   var h='<strong>'+ml('고객센터','カスタマーセンター','客服中心','Help Center')+'</strong><ul>';
   for(var i=0;i<M.length;i++)h+='<li'+(M[i][2]?' class="'+M[i][2]+'"':'')+'><a href="../'+M[i][0]+'">'+M[i][1]+'</a></li>';
   var T={'ml-ko':'광고문의','ml-ja':'広告のお問い合わせ','ml-zh':'广告咨询','ml-en':'Advertising'};
@@ -184,4 +184,66 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   function close(){o.remove()}
   o.querySelector('button').onclick=close;o.onclick=function(e){if(e.target===o)close()};
   document.body.appendChild(o);
+})();
+/* 261106 대표 지시: 기사 검색·최신 기사 줄·기사제보 (search.json = 생성기가 만듦, help/tip/ = 김재호 관리) */
+(function(){
+  var me=document.querySelector('script[src*="site.js"]');if(!me)return;
+  var src=me.getAttribute('src'),base=src.replace(/site\.js.*$/,''),ver=(src.split('v=')[1]||'');
+  function lg(){return (document.documentElement.getAttribute('data-l')||'KO').toLowerCase()}
+  function ml(k,j,z,e){return '<span class="ml-ko">'+k+'</span><span class="ml-ja">'+j+'</span><span class="ml-zh">'+z+'</span><span class="ml-en">'+e+'</span>'}
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  var st=document.createElement('style');st.textContent=
+   '.cen-tk{border-bottom:1px solid #e3e3e3;background:#fafafa;font-size:14px}.cen-tk .wrap{display:flex;align-items:center;gap:12px;height:38px;overflow:hidden}'+
+   '.cen-tk b{flex:none;color:#fff;background:var(--accent,#1f6f43);padding:2px 10px;border-radius:3px;font-size:13px}'+
+   '.cen-tk a{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#222}.cen-tk time{flex:none;color:#888;font-size:13px}'+
+   '.cen-sq{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;justify-content:center;align-items:flex-start;padding:60px 16px 16px}'+
+   '.cen-sq>div{background:#fff;width:100%;max-width:640px;max-height:80vh;display:flex;flex-direction:column;border-radius:8px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.25)}'+
+   '.cen-sq input{border:0;border-bottom:2px solid var(--accent,#1f6f43);padding:16px;font-size:17px;outline:0;width:100%;box-sizing:border-box}'+
+   '.cen-sq ul{list-style:none;margin:0;padding:0;overflow:auto}.cen-sq li a{display:block;padding:12px 16px;border-bottom:1px solid #eee;color:#222}'+
+   '.cen-sq li a:hover{background:#f4f8f5;text-decoration:none}.cen-sq li small{display:block;color:#888;font-size:13px;margin-top:2px}.cen-sq .none{padding:16px;color:#888}';
+  document.head.appendChild(st);
+  var DB=null,wait=[];
+  function db(f){if(DB)return f(DB);wait.push(f);if(wait.length>1)return;
+    fetch(base+'search.json?v='+ver).then(function(r){return r.json()}).then(function(j){DB=j;var w=wait;wait=[];w.forEach(function(g){g(DB)})}).catch(function(){wait=[]})}
+  function T(p,f){var l=lg();return (p[f]&&(p[f][l]||p[f].ko))||''}
+  /* 위 띠 링크: 검색 · 기사제보 */
+  var ad=document.querySelector('.topbar .adlink');
+  if(ad){
+    var s=document.createElement('a');s.className='adlink';s.href='#';s.innerHTML=ml('검색','検索','搜索','Search');ad.parentNode.insertBefore(s,ad);
+    var t=document.createElement('a');t.className='adlink';t.href=base+'help/tip/';t.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');ad.parentNode.insertBefore(t,ad);
+    s.addEventListener('click',function(e){e.preventDefault();open()});
+  }
+  var f=document.querySelector('.foot .wrap');
+  if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href=base+'help/tip/';b.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');f.appendChild(b)}
+  /* 검색 창 */
+  var PH={ko:'기사 제목·부제로 찾기',ja:'記事のタイトルで検索',zh:'按标题搜索',en:'Search headlines'};
+  var NO={ko:'찾는 기사가 없습니다.',ja:'該当する記事はありません。',zh:'没有找到相关文章。',en:'No matching articles.'};
+  function open(){
+    var o=document.createElement('div');o.className='cen-sq';
+    o.innerHTML='<div role="dialog" aria-modal="true"><input type="search" placeholder="'+PH[lg()]+'"><ul></ul></div>';
+    var i=o.querySelector('input'),u=o.querySelector('ul');
+    function close(){o.remove();document.removeEventListener('keydown',k)}
+    function k(e){if(e.key==='Escape')close()}
+    o.addEventListener('click',function(e){if(e.target===o)close()});document.addEventListener('keydown',k);
+    function run(){var q=i.value.trim().toLowerCase();if(!q){u.innerHTML='';return}
+      db(function(d){var w=q.split(/\s+/),r=[];
+        for(var n=0;n<d.length&&r.length<40;n++){var p=d[n],h=(T(p,'t')+' '+T(p,'u')).toLowerCase(),ok=true;
+          for(var m=0;m<w.length;m++)if(h.indexOf(w[m])<0){ok=false;break}
+          if(ok)r.push(p)}
+        u.innerHTML=r.length?r.map(function(p){return '<li><a href="'+base+'a/'+p.i+'/"><b>'+esc(T(p,'t'))+'</b><small>'+esc(p.d.replace(/-/g,'.'))+' · '+esc(T(p,'u').slice(0,80))+'</small></a></li>'}).join(''):'<li class="none">'+NO[lg()]+'</li>'})}
+    i.addEventListener('input',run);document.body.appendChild(o);i.focus();db(function(){});
+  }
+  /* 첫 화면: 메뉴 아래 최신 기사 줄 */
+  var nav=document.querySelector('nav.nav');
+  if(nav&&document.querySelector('main .front')){
+    var bar=document.createElement('div');bar.className='cen-tk';
+    bar.innerHTML='<div class="wrap"><b>'+ml('최신','最新','最新','Latest')+'</b><a href="#"></a><time></time></div>';
+    nav.parentNode.insertBefore(bar,nav.nextSibling);
+    var a=bar.querySelector('a'),tm=bar.querySelector('time'),idx=0,tmr=0;
+    db(function(d){var L=d.slice(0,10);if(!L.length){bar.remove();return}
+      function show(){var p=L[idx%L.length];a.href=base+'a/'+p.i+'/';a.textContent=T(p,'t');tm.textContent=p.d.replace(/-/g,'.');idx++}
+      show();tmr=setInterval(show,4000);
+      bar.addEventListener('mouseenter',function(){clearInterval(tmr)});bar.addEventListener('mouseleave',function(){clearInterval(tmr);tmr=setInterval(show,4000)});
+      document.addEventListener('click',function(e){if(e.target.closest('#langs button')){idx=Math.max(0,idx-1);show()}})});
+  }
 })();
