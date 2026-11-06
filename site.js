@@ -152,7 +152,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 })();
 /* 261102 대표 지시: 테스트 기간 — 첫화면 메인 기사 2개(큰기사+왼쪽 첫 기사)만 보이고 나머지 숨김. 기사 쪽도 그 2개만. 끝나면 ONLY2=false */
 (function(){
-  var ONLY2=true;if(!ONLY2)return;
+  var ONLY2=false;/* 261106 대표 지시: 숨긴 기사 전부 공개 */if(!ONLY2)return;
   if(/\/(help|privacy|ad)\//.test(location.pathname))return;
   var css=document.createElement('style');
   css.textContent='.front .leadmore,.front .col-l .card~.card,.front .col-r,main .secs{display:none!important}';
@@ -174,7 +174,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 })();
 /* 261102 대표 지시: 시험 운영 안내창 — 등록 나오면 TEST=false */
 (function(){
-  var TEST=true;if(!TEST)return;
+  var TEST=false;/* 261106 대표 지시: '테스트 중입니다' 안내창 없앰 */if(!TEST)return;
   if(/\/(help|privacy|ad|sec)\//.test(location.pathname))return;
   /* 261102 대표 지시: 안내창 매번 띄움(닫아도 쪽 옮기면 다시) */
   var c=document.createElement('style');c.textContent='.cen-test{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}.cen-test div{background:#fff;color:#222;max-width:420px;border-radius:10px;padding:22px 20px;line-height:1.6;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,.25)}.cen-test b{display:block;font-size:18px;margin-bottom:8px}.cen-test small{display:block;color:#666;margin-top:8px}.cen-test button{margin-top:14px;width:100%;padding:10px;border:0;border-radius:6px;background:#1f6f43;color:#fff;font-size:15px;cursor:pointer}';
