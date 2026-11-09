@@ -64,7 +64,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 
 /* 261029 고객센터: 위 띠·맨 아래에 링크 (HTML을 다시 만들어도 남도록 여기서 넣음) */
 (function(){
-  var ad=document.querySelector('.topbar .adlink');if(!ad)return;
+  var ad=document.querySelector('.topbar .adlink');if(!ad||document.querySelector('.topbar a[href$="help/"]'))return;/* 261110 생성기 쪽은 정적 링크 — help 쪽만 */
   var base=ad.getAttribute('href').replace(/ad\/?$/,'');
   var T='<span class="ml-ko">고객센터</span><span class="ml-ja">カスタマーセンター</span><span class="ml-zh">客服中心</span><span class="ml-en">Help Center</span>';
   var a=document.createElement('a');a.className='adlink';a.href=base+'help/';a.innerHTML=T;ad.parentNode.insertBefore(a,ad.nextSibling);
@@ -91,14 +91,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var a=document.querySelectorAll('a[href$="ad/"]');
   for(var i=0;i<a.length;i++)for(var c in T){var s=a[i].querySelector('.'+c);if(s)s.textContent=T[c]}
 })();
-/* 261029 기사 바이라인 = AI 기자 김기자 (생성기 글자는 시민에너지신문) → 기자 소개로 연결 */
-(function(){
-  var ad=document.querySelector('.topbar .adlink');if(!ad)return;
-  var base=ad.getAttribute('href').replace(/ad\/?$/,'');
-  var T={'ml-ko':'AI 기자 김기자','ml-ja':'AI記者 キム記者','ml-zh':'AI记者 金记者','ml-en':'AI Reporter Kim'};
-  for(var c in T){var m=document.querySelectorAll('.story .'+c+' .story-meta > span:first-child');
-    for(var i=0;i<m.length;i++){if(m[i].classList.contains('acts'))continue;m[i].innerHTML='<a class="byline" href="'+base+'help/reporters/"></a>';m[i].firstChild.textContent=T[c];}}
-})();
+/* 261110 기사 바이라인은 생성기가 정적으로 넣음(BYLINE_DEFAULT) */
 /* 261029 문체 담당 기자: help/reporters/mentors.json에서 그림 (withdrawn 날부터 빠짐) */
 (function(){
   var box=document.querySelectorAll('[data-mentors]');if(!box.length)return;
@@ -135,7 +128,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 })();
 /* 261029 법정 표기(신문법): 발행인·편집인·청소년보호책임자·주소 — 등록번호·등록일·전화는 등록 후 추가 */
 (function(){
-  var w=document.querySelector('.foot .wrap');if(!w)return;
+  var w=document.querySelector('.foot .wrap');if(!w||w.querySelector('.legal'))return;/* 261110 생성기 쪽은 정적 — help 쪽만 */
   var d=document.createElement('div');d.className='legal';
   d.textContent='발행인 김재호 · 편집인 김대오 · 청소년보호책임자 김대오 · 주소 부산광역시 사하구 하신중앙로 180, 103동 1302호';
   var s=w.querySelector('strong');w.insertBefore(d,s?s.nextSibling:w.firstChild);
@@ -155,7 +148,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var ONLY2=true;/* 261106 대표 지시: 숨긴 기사 전부 공개 → 같은 날 다시 가림 */if(!ONLY2)return;
   if(/\/(help|privacy|ad)\//.test(location.pathname))return;
   var css=document.createElement('style');
-  css.textContent='.front .leadmore,.front .col-l .card~.card,.front .col-r,main .secs,.cen-tk,.topbar .cen-srch{display:none!important}';
+  css.textContent='.front .leadmore,.front .col-l .card~.card,.front .col-r,main .secs,main .hband,.cen-tk,.topbar .cen-srch{display:none!important}';
   document.head.appendChild(css);
   function keep(doc){var a=[],l=doc.querySelector('.front .lead h2 a'),c=doc.querySelector('.front .col-l .card h3 a');if(l)a.push(l.getAttribute('href'));if(c)a.push(c.getAttribute('href'));return a.map(function(h){return h.replace(/^\.?\/?/,'').replace(/\/?$/,'/')})}
   var root=location.origin+'/';
