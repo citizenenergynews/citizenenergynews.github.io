@@ -239,7 +239,6 @@ main img{filter:brightness(1.08) saturate(1.12) contrast(1.02)}
 .story-body .interest b{color:var(--accent);margin-right:6px}
 .story-body .fix{border-top:1px solid var(--line);padding-top:10px;font-size:15px}
 .story-body .fix b{color:var(--accent);margin-right:6px}
-.story-body .trial{font-size:13px;color:var(--ink3)}
 .story-title .badge{vertical-align:middle;font-family:var(--sans);font-size:13px;color:var(--accent);border-color:var(--accent)}
 .col-r .col-h{margin:0 0 4px;font-size:15px;color:var(--ink3);font-weight:700}
 .hband{border-top:2px solid var(--accent);margin:24px 0;padding-top:10px}
