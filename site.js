@@ -239,4 +239,8 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
       bar.addEventListener('mouseenter',function(){clearInterval(tmr)});bar.addEventListener('mouseleave',function(){clearInterval(tmr);tmr=setInterval(show,4000)});
       document.addEventListener('click',function(e){if(e.target.closest('#langs button')){idx=Math.max(0,idx-1);show()}})});
   }
+  // 칸 목록 전체/국내/해외 버튼 (261112 사용자)
+  document.addEventListener('click',function(e){var b=e.target.closest('.rgn button');if(!b)return;
+    var box=b.closest('.list');box.setAttribute('data-show',b.getAttribute('data-r'));
+    box.querySelectorAll('.rgn button').forEach(function(x){x.classList.toggle('on',x===b)})});
 })();
