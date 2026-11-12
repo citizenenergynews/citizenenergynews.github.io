@@ -16,7 +16,7 @@ set(L);
 
 // 방문자 집계(구글 애널리틱스)
 (function(){var id='G-CC8TZ9T7TV';var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(s);
-window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);})();
+window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',id);gtag('config','G-FRN7DSNL76');})();  // 261112 사용자 계정 GA 추가(기존 CC8T는 다른 계정 것이라 유지)
 // 공감·공유 (대표 지시 261023). 공감 수는 abacus.jasoncameron.dev 무료 카운터, 중복 공감은 브라우저에 기억
 (function(){var as=document.querySelectorAll('.acts');if(!as.length)return;
 var id=as[0].getAttribute('data-id'),NS='https://abacus.jasoncameron.dev/',K='citizenenergynews/'+id;
