@@ -244,3 +244,12 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
     var box=b.closest('.list');box.setAttribute('data-show',b.getAttribute('data-r'));
     box.querySelectorAll('.rgn button').forEach(function(x){x.classList.toggle('on',x===b)})});
 })();
+// 방문자·조회수 표 (261114 사용자 "일단 보고 가리게") — 주소에 ?stats=1 있을 때만 맨 아래에 보임. 숫자는 Apps Script 「시민에너지신문 방문자 중계」(gjho0505, GA 560462776, 2분 캐시)
+(function(){if(!/[?&]stats=1/.test(location.search))return;var f=document.querySelector('footer.foot .wrap');if(!f)return;
+fetch('https://script.google.com/macros/s/AKfycbxZzVgt1aDKb47m_Y04H3c-RlAgljGaIb1nQQiMNU6ms8ZSWSS5ELVJPTFRluEAp25U/exec').then(function(r){return r.json()}).then(function(d){
+ var n=function(x){return Number(x).toLocaleString('ko-KR')},c='padding:2px 10px;text-align:right';
+ var t=document.createElement('table');t.style.cssText='margin:10px 0;font-size:13px;border-collapse:collapse';
+ t.innerHTML='<tr><th></th><th style="'+c+'">오늘</th><th style="'+c+'">어제</th><th style="'+c+'">누적</th></tr>'+
+  '<tr><th style="text-align:left">방문자</th><td style="'+c+'">'+n(d.today.visitors)+'</td><td style="'+c+'">'+n(d.yesterday.visitors)+'</td><td style="'+c+'">'+n(d.total.visitors)+'</td></tr>'+
+  '<tr><th style="text-align:left">조회수</th><td style="'+c+'">'+n(d.today.views)+'</td><td style="'+c+'">'+n(d.yesterday.views)+'</td><td style="'+c+'">'+n(d.total.views)+'</td></tr>';
+ f.appendChild(t)}).catch(function(){})})();
