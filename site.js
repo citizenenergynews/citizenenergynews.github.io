@@ -130,7 +130,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
 (function(){
   var w=document.querySelector('.foot .wrap');if(!w||w.querySelector('.legal'))return;/* 261110 생성기 쪽은 정적 — help 쪽만 */
   var d=document.createElement('div');d.className='legal';
-  d.textContent='등록번호 부산,아00715 · 등록일 2026.11.09 · 발행인 김재호 · 편집인 김대오 · 청소년보호책임자 김대오 · 주소 부산광역시 사하구 하신중앙로 180, 103동 1302호 · 전화 1644-2358';
+  d.textContent='등록번호 부산,아00715 · 등록일 2026.11.09 · 발행인 김재호 · 편집인 김대오 · 청소년보호책임자 김대오 · 주소 부산광역시 사하구 하신중앙로 180 · 전화 1644-2358';
   var s=w.querySelector('strong');w.insertBefore(d,s?s.nextSibling:w.firstChild);
 })();
 /* 261029 인터넷신문 등록 전 기사 숨김 — 등록 나오면 HIDE=false 로 바꾸면 그대로 되돌아옴 */
