@@ -244,10 +244,3 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
     var box=b.closest('.list');box.setAttribute('data-show',b.getAttribute('data-r'));
     box.querySelectorAll('.rgn button').forEach(function(x){x.classList.toggle('on',x===b)})});
 })();
-// 방문자·조회수 표 (261114 사용자 "일단 보고 가리게", 같은 날 "누적 조회수만, 표시는 '조회수'") — 주소에 ?stats=1 있을 때만 맨 아래에 보임. 숫자는 Apps Script 「시민에너지신문 방문자 중계」(gjho0505, GA 560462776, 2분 캐시)
-(function(){if(!/[?&]stats=1/.test(location.search))return;var f=document.querySelector('footer.foot .wrap');if(!f)return;
-fetch('https://script.google.com/macros/s/AKfycbxZzVgt1aDKb47m_Y04H3c-RlAgljGaIb1nQQiMNU6ms8ZSWSS5ELVJPTFRluEAp25U/exec').then(function(r){return r.json()}).then(function(d){
- var n=function(x){return Number(x).toLocaleString('ko-KR')};
- var p=document.createElement('p');p.style.cssText='margin:10px 0;font-size:13px';
- p.textContent='조회수 '+n(d.total.views);
- f.appendChild(p)}).catch(function(){})})();
