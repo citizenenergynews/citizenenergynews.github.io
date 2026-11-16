@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://citizenenergynews.com/sitemap.xml
+Sitemap: https://citizenenergynews.com/news-sitemap.xml
