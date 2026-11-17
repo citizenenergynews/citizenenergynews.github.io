@@ -126,6 +126,9 @@ html[data-l=ZH] .ml-zh,html[data-l=EN] .ml-en{display:block}
 }
 
 /* GitHub Pages 추가 */
+/* 261117 사용자: 제호 앞 동그란 로고 */
+.mast>a{display:inline-flex;align-items:center;gap:14px}
+.mast-logo{width:clamp(40px,7vw,64px);height:auto;flex:none}
 .ml-ko,.ml-zh,.ml-en{}
 span.ml-ja,span.ml-zh,span.ml-en{display:none}
 html[data-l=JA] span.ml-ko,html[data-l=ZH] span.ml-ko,html[data-l=EN] span.ml-ko{display:none}
