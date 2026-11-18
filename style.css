@@ -166,8 +166,11 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .adslot.slogan.sm{padding:16px 14px;margin:0;word-break:keep-all}
 .adslot.slogan.sm strong{font-size:17px}
 .adslot.slogan.sm em{font-size:12px;margin-top:4px}
-.col-r>.adslot,.col-r>.adbox{margin-top:16px}
-.col-r>.adslot.sm{max-width:300px;margin-left:auto}
+/* 261118 사용자 "3번 밑 광고 길게, 왼쪽으로 몇 개 더": 1면 '오늘 주목할 소식' 밑 3칸(side3·side2·side), 칸 높이 150, 900px 밑은 1칸만 */
+.side-ads{display:grid;grid-template-columns:repeat(3,1fr);gap:0 28px;margin-top:16px}
+.side-ads .adbox{margin:0!important}
+.side-ads .adslot.sm{min-height:150px;display:flex;flex-direction:column;justify-content:center}
+@media (max-width:900px){.side-ads{grid-template-columns:1fr}.side-ads>.adslot.sm:not(:last-child),.side-ads>.adbox:not(:last-child){display:none}}
 .mast{position:relative}
 .mast-ad{position:absolute;top:50%;right:max(16px,calc(50% - 584px));transform:translateY(-50%);width:240px}
 .mast-ad .adbox{margin:0!important}
@@ -175,7 +178,7 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .art-side{padding-top:32px}
 .art-side>*{position:sticky;top:16px}
 .art-side .adslot+.adslot,.art-side .adbox+.adbox,.art-side .adslot+.adbox,.art-side .adbox+.adslot{margin-top:16px}
-@media (max-width:1100px){.mast-ad{position:static;transform:none;width:auto;max-width:420px;margin:10px auto 0;padding:0 16px}.art-grid{display:block}.art-side{padding:0 0 24px}.art-side>*{position:static}.col-r>.adslot.sm{max-width:none}}
+@media (max-width:1100px){.mast-ad{position:static;transform:none;width:auto;max-width:420px;margin:10px auto 0;padding:0 16px}.art-grid{display:block}.art-side{padding:0 0 24px}.art-side>*{position:static}}
 .adslot.slogan a{display:inline-block;margin-top:10px;font-size:12px;color:#fff;opacity:.8;text-decoration:underline}
 .adpage{max-width:760px;margin:0 auto;padding:32px 0 48px;font-size:17px;line-height:1.8}
 .adpage .btn{display:inline-block;background:var(--accent);color:#fff;padding:12px 22px;border-radius:4px;font-weight:700;margin-top:12px}
