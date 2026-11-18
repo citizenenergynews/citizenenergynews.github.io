@@ -170,7 +170,9 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .side-ads{display:grid;grid-template-columns:repeat(3,1fr);gap:0 28px;margin-top:16px}
 .side-ads .adbox{margin:0!important}
 .side-ads .adslot.sm{min-height:150px;display:flex;flex-direction:column;justify-content:center}
-@media (max-width:900px){.side-ads{grid-template-columns:1fr}.side-ads>.adslot.sm:not(:last-child),.side-ads>.adbox:not(:last-child){display:none}}
+/* 261118 사용자 "모바일 여기 광고 1개 더": 1면 왼쪽 기사 묶음 끝(mid), 휴대폰에서만 */
+.m-ad{display:none}
+@media (max-width:900px){.m-ad{display:block;margin-top:16px}.side-ads{grid-template-columns:1fr}.side-ads>.adslot.sm:not(:last-child),.side-ads>.adbox:not(:last-child){display:none}}
 .mast{position:relative}
 .mast-ad{position:absolute;top:50%;right:max(16px,calc(50% - 584px));transform:translateY(-50%);width:240px}
 .mast-ad .adbox{margin:0!important}
