@@ -8,7 +8,7 @@ var HL={KO:'ko',JA:'ja',ZH:'zh-CN',EN:'en'};
 function set(l){L=l;document.documentElement.setAttribute('data-l',l);document.documentElement.lang=HL[l];try{localStorage.setItem('sen-lang',l)}catch(e){}
  var d=new Date(),t=document.getElementById('today');if(t)t.textContent=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')+' ('+D[l][d.getDay()]+')';
  var g=document.getElementById('tagline');if(g)g.textContent=TAG[l];var f=document.getElementById('foot-txt');if(f)f.textContent=FOOT[l];
- var bs=document.querySelectorAll('#langs button');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].getAttribute('data-l')===l);
+ var bs=document.querySelectorAll('#langs [data-l]');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].getAttribute('data-l')===l);
  var tt=document.querySelector('[data-title-'+l.toLowerCase()+']');if(tt)document.title=tt.getAttribute('data-title-'+l.toLowerCase());}
 document.addEventListener('click',function(e){var b=e.target.closest('#langs button');if(b)set(b.getAttribute('data-l'))});
 set(L);
@@ -27,7 +27,7 @@ if(done)each(function(a){a.querySelector('.like').classList.add('on')});
 fetch(NS+'get/'+K).then(function(r){return r.json()}).then(function(j){show(j.value||0)}).catch(function(){});
 var MSG={KO:'URL이 복사되었습니다.',JA:'URLをコピーしました。',ZH:'网址已复制。',EN:'URL copied.'};
 function lang(){return document.documentElement.getAttribute('data-l')||'KO'}
-function url(){return location.origin+location.pathname+'?lang='+lang().toLowerCase()}
+function url(){return location.origin+location.pathname}  /* 261119 언어별 주소 — 주소에 언어가 들어 있음 */
 document.addEventListener('click',function(e){var b=e.target.closest('.acts [data-act]');if(!b)return;e.preventDefault();var a=b.closest('.acts'),t=b.getAttribute('data-act');
  if(t==='like'){if(done)return;done=true;each(function(x){x.querySelector('.like').classList.add('on')});try{localStorage.setItem('sen-like-'+id,'1')}catch(x){}
   show((parseInt(a.querySelector('.like b').textContent,10)||0)+1);fetch(NS+'hit/'+K).then(function(r){return r.json()}).then(function(j){show(j.value)}).catch(function(){});return}
@@ -78,7 +78,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   function ml(k,j,z,e){return '<span class="ml-ko">'+k+'</span><span class="ml-ja">'+j+'</span><span class="ml-zh">'+z+'</span><span class="ml-en">'+e+'</span>'}
   var M=[['help/',ml('고객센터 안내','カスタマーセンター','客服中心','Help Center'),''],['help/reporters/',ml('기자 소개','記者紹介','记者介绍','Our Reporters'),''],['ad/',ml('광고문의','広告のお問い合わせ','广告咨询','Advertising'),'on'],['help/partner/',ml('제휴문의','提携のお問い合わせ','合作咨询','Partnerships'),''],['help/tip/',ml('기사제보','情報提供','新闻爆料','News Tips'),''],['help/copyright/',ml('저작권문의','著作権のお問い合わせ','版权咨询','Copyright'),''],['help/rules/',ml('보도준칙','報道準則','报道准则','Reporting Guidelines'),''],['help/press-ethics/',ml('언론윤리강령','言論倫理綱領','新闻伦理纲领','Press Code of Ethics'),'sub'],['help/reporter-ethics/',ml('기자윤리강령','記者倫理綱領','记者伦理纲领',"Journalists' Code of Ethics"),'sub']];
   var h='<strong>'+ml('고객센터','カスタマーセンター','客服中心','Help Center')+'</strong><ul>';
-  for(var i=0;i<M.length;i++)h+='<li'+(M[i][2]?' class="'+M[i][2]+'"':'')+'><a href="../'+M[i][0]+'">'+M[i][1]+'</a></li>';
+  for(var i=0;i<M.length;i++)h+='<li'+(M[i][2]?' class="'+M[i][2]+'"':'')+'><a href="'+(M[i][0]==='ad/'?'./':'/'+M[i][0])+'">'+M[i][1]+'</a></li>';
   var T={'ml-ko':'광고문의','ml-ja':'広告のお問い合わせ','ml-zh':'广告咨询','ml-en':'Advertising'};
   for(var c in T){var t=pg.querySelector('.'+c+' h1.story-title');if(t)t.textContent=T[c]}
   document.title=document.title.replace(/광고·제휴 문의/,'광고문의');

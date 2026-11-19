@@ -130,6 +130,10 @@ html[data-l=ZH] .ml-zh,html[data-l=EN] .ml-en{display:block}
 .mast>a{display:inline-flex;align-items:center;gap:14px}
 .mast-logo{width:clamp(40px,7vw,64px);height:auto;flex:none}
 .ml-ko,.ml-zh,.ml-en{}
+/* 261119 언어별 주소: 언어 버튼이 링크가 됨(고객센터 쪽은 버튼 그대로) */
+.langs a{color:var(--ink3);padding:4px 8px;border-radius:3px}
+.langs a:hover{text-decoration:none}
+.langs a.on{color:#fff;background:var(--accent);font-weight:700}
 span.ml-ja,span.ml-zh,span.ml-en{display:none}
 html[data-l=JA] span.ml-ko,html[data-l=ZH] span.ml-ko,html[data-l=EN] span.ml-ko{display:none}
 html[data-l=JA] span.ml-ja,html[data-l=ZH] span.ml-zh,html[data-l=EN] span.ml-en{display:inline}
