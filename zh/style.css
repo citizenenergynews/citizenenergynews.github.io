@@ -187,6 +187,10 @@ html[lang=ja] .story-title,html[lang=ja] .mast h1{font-family:'Noto Serif JP',va
 .art-side{padding-top:32px}
 .art-side>*{position:sticky;top:16px}
 .art-side .adslot+.adslot,.art-side .adbox+.adbox,.art-side .adslot+.adbox,.art-side .adbox+.adslot{margin-top:16px}
+/* 261119 사용자 "빈칸에 큰 광고 넣어": 기사 오른쪽 기둥 aside2 밑 큰 칸(aside3, 300×600 — 화면이 낮으면 줄어듦), PC에서만 */
+.art-side>div>:nth-child(3){min-height:min(600px,calc(100vh - 300px));display:flex;flex-direction:column;justify-content:center}
+.art-side>div>.adslot.sm:nth-child(3) strong{font-size:26px}
+.art-side>div>.adslot.sm:nth-child(3) em{font-size:13px;margin-top:10px}
 @media (max-width:1100px){.mast-ad{position:static;transform:none;width:auto;max-width:420px;margin:10px auto 0;padding:0 16px}.art-grid{display:block}.art-side{padding:0 0 24px}.art-side>*{position:static}.art-side>div>:nth-child(n+2){display:none}}
 /* 261118 사용자 "반영": 휴대폰 기사 끝에 띠 3개(end·aside·aside2)가 연달아 → 1100px 밑에선 aside2를 숨겨 2개만 */
 .adslot.slogan a{display:inline-block;margin-top:10px;font-size:12px;color:#fff;opacity:.8;text-decoration:underline}
