@@ -33,13 +33,18 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
+      # 261125: 정각(07·18시) 혼잡 때 올린 묶음이 바로 안 보여 "No artifacts named github-pages" 실패(11/24·25 18시)
+      # → 올린 뒤 20초 기다리고, 실패하면 90초 기다렸다 다시 시도
+      - run: sleep 20
       - id: first
         uses: actions/deploy-pages@v4
         continue-on-error: true
         with:
-          timeout: 1800000
+          timeout: 600000
+      - if: steps.first.outcome == 'failure'
+        run: sleep 90
       - id: retry
         if: steps.first.outcome == 'failure'
         uses: actions/deploy-pages@v4
         with:
-          timeout: 1800000
+          timeout: 600000
