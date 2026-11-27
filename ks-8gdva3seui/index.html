@@ -89,9 +89,9 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 </table></div>
 
 <details class="fold">
-<summary>4. 연도별 계산(만원) <span>(눌러서 펼치기)</span></summary>
+<summary>4. 연도별 계산 <span>(눌러서 펼치기)</span></summary>
 <div class="tw"><table id="t_yr">
-<tr><th>연도</th><th>매출</th><th>지출</th><th>순익</th></tr>
+<tr><th>연도</th><th>매출(원)</th><th>지출(원)</th><th>순익(원)</th></tr>
 </table></div>
 </details>
 
@@ -145,7 +145,7 @@ function calc(){
  [['(1) 착공',0.1,'착공 후 1주일 이내'],['(2) 완공',0.5,'완공 후 1주일 이내'],['(3) 계통연계',0.4,'계통연계 뒤 첫 수익 발생 시']].forEach(function(e){
   row(c,[[e[0]],[m(pay*e[1]),'n'],[pc(e[1],0),'c'],[e[2]]])});
  row(c,[['합계'],[m(pay),'n'],['100%','c'],['']],'sum');
- var yt=$('t_yr');clear(yt);function w(n){return f(n/10000)}
+ var yt=$('t_yr');clear(yt);var w=m;
  YR.forEach(function(e){row(yt,[[e[0]+'년차','c'],[w(e[1]),'n'],[w(e[2]),'n'],[w(e[3]),'n']])});
  row(yt,[['합계','c'],[w(S.rev),'n'],[w(S.exp),'n'],[w(S.net),'n']],'sum');
  var q=$('t_eq');clear(q);
