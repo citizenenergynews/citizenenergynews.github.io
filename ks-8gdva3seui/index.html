@@ -30,13 +30,33 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 .fold summary span{font-size:12px;font-weight:normal;color:#888}
 .fold[open] summary span{display:none}
 .foot{color:#666;font-size:12px;margin:18px 0 30px}
-@media(max-width:520px){table{font-size:12px}th,td{padding:4px 5px}.inbox input{width:130px}}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pbtn{flex:none;display:flex;align-items:center;gap:5px;margin-top:6px;padding:7px 10px;border:1px solid var(--g);border-radius:8px;background:#fff;color:var(--g);font-size:13px;font-weight:bold;cursor:pointer}
+.pbtn:hover{background:var(--head)}
+.pbtn svg{width:20px;height:20px}
+@media(max-width:520px){table{font-size:12px}th,td{padding:4px 5px}.inbox input{width:130px}.pbtn span{display:none}}
+@page{size:A4;margin:12mm}
+@media print{
+ body{background:#fff;font-size:12px}
+ .wrap{max-width:none;padding:0}
+ .pbtn,.fold summary span{display:none}
+ .inbox{border-width:1px;padding:8px;margin-bottom:10px}
+ .inbox input{font-size:16px;border:none;background:none;width:110px}
+ h2,.fold summary{font-size:14px;margin:12px 0 5px}
+ table{font-size:11px}th,td{padding:3px 6px}
+ th,tr.sum td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ tr,h2{break-inside:avoid}h2{break-after:avoid}
+ .tw{overflow:visible}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
+<div class="top">
 <h1>국민솔라 공공개발 수익 배분 계산기</h1>
-<p class="note">설비용량(kW)만 넣으면 전부 다시 계산됩니다 · 금액 단위 만원 · 세전</p>
+<button class="pbtn" id="pbtn" type="button" title="인쇄 또는 PDF로 저장"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>인쇄·PDF</span></button>
+</div>
+<p class="note">설비용량(kW)만 넣으면 전부 다시 계산됩니다 · 금액은 만원 단위 반올림 · 세전</p>
 
 <div class="inbox">
 <label for="kw">설비용량</label>
@@ -50,28 +70,28 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <tr><td>설비용량</td><td class="n" id="b_kw"></td><td class="c">kW</td><td id="b_mw"></td></tr>
 <tr><td>매전단가</td><td class="n" id="b_p"></td><td class="c">원/kWh</td><td id="b_pn"></td></tr>
 <tr><td>사업기간</td><td class="n" id="b_y"></td><td class="c">년</td><td>상업운전일부터</td></tr>
-<tr><td>총사업비</td><td class="n" id="b_cost"></td><td class="c">만원</td><td id="b_costn"></td></tr>
-<tr><td>연매출</td><td class="n" id="b_rev"></td><td class="c">만원/년</td><td>20년 평균</td></tr>
-<tr><td>연지출</td><td class="n" id="b_exp"></td><td class="c">만원/년</td><td>원금·이자·운영유지비·감가상각·임대료 등</td></tr>
-<tr><td>연순익</td><td class="n" id="b_net"></td><td class="c">만원/년</td><td>20년 평균, 세전</td></tr>
-<tr><td>20년 순익</td><td class="n" id="b_net20"></td><td class="c">만원</td><td id="b_irr"></td></tr>
+<tr><td>총사업비</td><td class="n" id="b_cost"></td><td class="c">원</td><td id="b_costn"></td></tr>
+<tr><td>연매출</td><td class="n" id="b_rev"></td><td class="c">원/년</td><td>20년 평균</td></tr>
+<tr><td>연지출</td><td class="n" id="b_exp"></td><td class="c">원/년</td><td>원금·이자·운영유지비·감가상각·임대료 등</td></tr>
+<tr><td>연순익</td><td class="n" id="b_net"></td><td class="c">원/년</td><td>20년 평균, 세전</td></tr>
+<tr><td>20년 순익</td><td class="n" id="b_net20"></td><td class="c">원</td><td id="b_irr"></td></tr>
 <tr><td>발전량</td><td class="n" id="b_gen"></td><td class="c">MWh/년</td><td id="b_genn"></td></tr>
 </table></div>
 
 <h2>2. 현금지급형 (kW당 2.5만원)</h2>
 <div class="tw"><table id="t_cash">
-<tr><th>단계</th><th>금액(만원)</th><th>비율</th><th>지급 시기</th></tr>
+<tr><th>단계</th><th>금액(원)</th><th>비율</th><th>지급 시기</th></tr>
 </table></div>
 
 <h2>2-1. 지분 참여형(공익사업비 포함)</h2>
 <div class="tw"><table id="t_eq">
-<tr><th>구분</th><th>지분율</th><th>출자액(만원)</th><th>20년 순익 배분(만원)</th><th>연평균(만원/년)</th></tr>
+<tr><th>구분</th><th>지분율</th><th>출자액(원)</th><th>20년 순익 배분(원)</th><th>연평균(원/년)</th></tr>
 </table></div>
 
 <details class="fold">
 <summary>1-1. 지출표 <span>(눌러서 펼치기)</span></summary>
 <div class="tw"><table id="t_exp">
-<tr><th>항목</th><th>20년 계(만원)</th><th>연평균(만원/년)</th><th>비중</th><th>산정 근거</th></tr>
+<tr><th>항목</th><th>20년 계(원)</th><th>연평균(원/년)</th><th>비중</th><th>산정 근거</th></tr>
 </table></div>
 </details>
 
@@ -81,7 +101,9 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 // 원본: 국민솔라 공공개발 수익 배분 계산기 V13 261127.xlsx (기본가정 시트 값 그대로)
 var A={smp:136.6,rec:49.6,w:1,hr:3.6,deg:0.005,unit:1750000,pf:0.8,rate:0.048,grace:1,repay:19,om:0.107276,lease:0.17164,years:20,cashUnit:25000};
 function f(n){return Math.round(n).toLocaleString('ko-KR')}
-function m(n){var v=n/10000;return v.toLocaleString('ko-KR',{maximumFractionDigits:Math.abs(v)<10?1:0})}
+function m(n){var s=n<0?'-':'';n=Math.abs(n);if(n<100000)return s+(n/10000).toLocaleString('ko-KR',{maximumFractionDigits:1})+'만';
+ var w=Math.round(n/10000),e=Math.floor(w/10000),r=w%10000;
+ return s+(e?e.toLocaleString('ko-KR')+'억'+(r?' '+r.toLocaleString('ko-KR')+'만':''):r.toLocaleString('ko-KR')+'만')}
 function pc(n,d){return (n*100).toFixed(d)+'%'}
 function irr(cf){var lo=-0.99,hi=1;function npv(r){var s=0;for(var i=0;i<cf.length;i++)s+=cf[i]/Math.pow(1+r,i);return s}
  for(var k=0;k<200;k++){var m=(lo+hi)/2;if(npv(m)>0)lo=m;else hi=m}return (lo+hi)/2}
@@ -101,7 +123,7 @@ function calc(){
  $('mw').textContent=(kw/1000).toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:3})+'MW';
  $('b_kw').textContent=f(kw);$('b_mw').textContent=$('mw').textContent;
  $('b_p').textContent=price.toFixed(1);$('b_pn').textContent='SMP '+A.smp+' + REC '+A.rec;
- $('b_y').textContent=Y;$('b_cost').textContent=m(cost);$('b_costn').textContent='kW당 '+m(A.unit)+'만원';
+ $('b_y').textContent=Y;$('b_cost').textContent=m(cost);$('b_costn').textContent='kW당 '+m(A.unit)+'원';
  $('b_rev').textContent=m(S.rev/Y);$('b_exp').textContent=m(S.exp/Y);$('b_net').textContent=m(S.rev/Y-S.exp/Y);
  $('b_net20').textContent=m(S.net);$('b_irr').textContent='세전 · IRR '+pc(r,2);
  $('b_gen').textContent=f(gen1);$('b_genn').textContent='첫해 · 20년 합계 '+f(S.gen)+'MWh';
@@ -111,7 +133,7 @@ function calc(){
   row(t,[[e[0]],[m(e[1]),'n'],[m(e[1]/Y),'n'],[pc(e[1]/tot,1),'n'],[e[2]]])});
  row(t,[['합계'],[m(S.exp),'n'],[m(S.exp/Y),'n'],['100.0%','n'],['']],'sum');
  var c=$('t_cash');clear(c);var pay=kw*A.cashUnit;
- row(c,[['kW당 단가'],[m(A.cashUnit),'n'],['만원/kW','c'],['']]);
+ row(c,[['kW당 단가'],[m(A.cashUnit),'n'],['원/kW','c'],['']]);
  row(c,[['총 지급액'],[m(pay),'n'],['','c'],['설비용량 '+f(kw)+'kW × 단가']]);
  [['(1) 착공',0.1,'착공 후 1주일 이내'],['(2) 완공',0.5,'완공 후 1주일 이내'],['(3) 계통연계',0.4,'계통연계 뒤 첫 수익 발생 시']].forEach(function(e){
   row(c,[[e[0]],[m(pay*e[1]),'n'],[pc(e[1],0),'c'],[e[2]]])});
@@ -119,9 +141,13 @@ function calc(){
  var q=$('t_eq');clear(q);
  [['(1) 전략적 투자자',0.5,''],['(2) 국민솔라',0.5,''],['- 본사(KS분 50%의 30%)',0.15,'sub'],['- 경인(KS분 50%의 20%)',0.1,'sub'],['- 지역(KS분 50%의 50%)',0.25,'sub'],['합계',1,'sum']].forEach(function(e){
   row(q,[[e[0]],[pc(e[1],0),'c'],[m(eq*e[1]),'n'],[m(S.net*e[1]),'n'],[m(S.net*e[1]/Y),'n']],e[2])});
- $('foot').textContent='※ 출자액 = 자기자본 '+m(eq)+'만원 × 지분율 · 순익 배분 = 20년 순익(세전) × 지분율 · 가정: SMP '+A.smp+'·REC '+A.rec+'원/kWh, 발전 '+A.hr+'시간/일, 효율 저하 연 0.5%, kW당 사업비 '+m(A.unit)+'만원, PF 80%·금리 4.8%·1년 거치 19년 분할 (2026-11-27 기준)';
+ $('foot').textContent='※ 출자액 = 자기자본 '+m(eq)+'원 × 지분율 · 순익 배분 = 20년 순익(세전) × 지분율 · 가정: SMP '+A.smp+'·REC '+A.rec+'원/kWh, 발전 '+A.hr+'시간/일, 효율 저하 연 0.5%, kW당 사업비 '+m(A.unit)+'원, PF 80%·금리 4.8%·1년 거치 19년 분할 (2026-11-27 기준)';
 }
 $('kw').addEventListener('input',calc);calc();
+var fd=document.querySelector('.fold'),fo;
+window.addEventListener('beforeprint',function(){fo=fd.open;fd.open=true});
+window.addEventListener('afterprint',function(){fd.open=fo});
+$('pbtn').addEventListener('click',function(){window.print()});
 </script>
 </body>
 </html>
