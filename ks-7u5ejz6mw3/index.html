@@ -179,6 +179,7 @@ function load(){K.forEach(function(k){$('i_'+k).value=D[k]});calc()}
 K.forEach(function(k){$('i_'+k).addEventListener('input',calc)});
 $('rst').addEventListener('click',load);
 load();
+var qk=parseFloat(new URLSearchParams(location.search).get('kw'));if(qk>0){$('i_kw').value=qk;calc()}   // 부지 검토 쪽(ks-2x9jdh2h9t)에서 넘어온 용량
 var fds=[].slice.call(document.querySelectorAll('.fold')),fo=[];
 window.addEventListener('beforeprint',function(){fo=fds.map(function(d){var o=d.open;d.open=true;return o})});
 window.addEventListener('afterprint',function(){fds.forEach(function(d,i){d.open=fo[i]})});
