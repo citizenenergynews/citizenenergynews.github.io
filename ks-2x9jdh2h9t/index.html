@@ -380,7 +380,11 @@ $('t_zone').addEventListener('change',function(ev){var i=ev.target.getAttribute(
 $('t_zone').addEventListener('click',function(ev){var i=ev.target.getAttribute('data-del');if(i!=null){S.zones.splice(+i,1);layout()}});
 
 // ---- 배치도 PDF(A3 가로, 회사 도곽) ----
-function makeSheet(){
+// 위성사진 타일(브이월드, CORS 허용) — z/x/y 타일 ↔ 경위도
+function tileLL(x,y,z){var s=Math.pow(2,z),n=Math.PI-2*Math.PI*y/s;return [x/s*360-180,Math.atan(Math.sinh(n))/D2R]}
+function llTile(lon,lat,z){var s=Math.pow(2,z),sn=Math.sin(lat*D2R);return [(lon+180)/360*s,(0.5-Math.log((1+sn)/(1-sn))/(4*Math.PI))*s]}
+function loadImg(u){return new Promise(function(ok){var i=new Image();i.crossOrigin='anonymous';i.onload=function(){ok(i)};i.onerror=function(){ok(null)};i.src=u})}
+async function makeSheet(){
  var R=8,PW=420,PH=297,cv=document.createElement('canvas');cv.width=PW*R;cv.height=PH*R;
  var c=cv.getContext('2d'),FONT='"Malgun Gothic","Apple SD Gothic Neo",sans-serif';
  c.fillStyle='#fff';c.fillRect(0,0,cv.width,cv.height);c.scale(R,R);c.lineJoin='round';
@@ -397,10 +401,21 @@ function makeSheet(){
  function text(s,x,y,h,al,bold){c.font=(bold?'bold ':'')+h+'px '+FONT;c.fillStyle='#000';c.textAlign=al||'left';c.textBaseline=al=='center'?'middle':'alphabetic';c.fillText(s,x,y)}
  // 그림(안쪽 칸 안에만)
  c.save();c.beginPath();c.rect(IL,IT,IR-IL,IB-IT);c.clip();
- S.bldgs.forEach(function(b){poly(b.ll.map(mm).map(M),'#f2f2f2','#b0b0b0',0.12)});
+ // 실사진(위성) 깔기: 안쪽 칸 범위 → 경위도 → 타일
+ var P2ll=function(X,Y){return unme([(cx+(X-ICX)*SC)/1000,(cy-(Y-ICY)*SC)/1000])};
+ var a0=P2ll(IL,IT),a1=P2ll(IR,IB),mpp=SC/1000/R,z=Math.min(19,Math.max(12,Math.ceil(Math.log2(156543.03*Math.cos(C0[1]*D2R)/mpp))));
+ for(;z>12;z--){var t0=llTile(a0[0],a0[1],z),t1=llTile(a1[0],a1[1],z);if((Math.floor(t1[0])-Math.floor(t0[0])+1)*(Math.floor(t1[1])-Math.floor(t0[1])+1)<=400)break}
+ t0=llTile(a0[0],a0[1],z);t1=llTile(a1[0],a1[1],z);
+ var jobs=[];for(var tx=Math.floor(t0[0]);tx<=Math.floor(t1[0]);tx++)for(var ty=Math.floor(t0[1]);ty<=Math.floor(t1[1]);ty++)(function(tx,ty){
+  jobs.push(loadImg('https://api.vworld.kr/req/wmts/1.0.0/'+VK+'/Satellite/'+z+'/'+ty+'/'+tx+'.jpeg').then(function(im){return {im:im,x:tx,y:ty}}))})(tx,ty);
+ var tiles=await Promise.all(jobs),bad=0;
+ tiles.forEach(function(t){if(!t.im){bad++;return}
+  var p=M(mm(tileLL(t.x,t.y,z))),q=M(mm(tileLL(t.x+1,t.y+1,z)));c.drawImage(t.im,p[0],p[1],q[0]-p[0]+0.03,q[1]-p[1]+0.03)});
+ sheetNote=bad?('위성사진 '+bad+'/'+tiles.length+'장을 받지 못했습니다'):'';
+ S.bldgs.forEach(function(b){poly(b.ll.map(mm).map(M),null,'rgba(255,255,255,.75)',0.15)});
  poly(S.parcel.map(mm).map(M),null,'#d0006f',0.45);
  var ZS=S.zones.filter(function(z){return z.n});
- ZS.forEach(function(z){poly(z.ll.map(mm).map(M),'rgba(0,160,60,.08)','#109040',0.3);
+ ZS.forEach(function(z){poly(z.ll.map(mm).map(M),'rgba(0,200,80,.12)','#20e060',0.35);
   z.mods.forEach(function(m){poly(m.map(function(p){return M([p[0]*1000,p[1]*1000])}),'#2f55c8','#ffffff',0.04)})});
  ZS.forEach(function(z,i){var q=M(z.ll.map(mm).reduce(function(a,p,_,A){return [a[0]+p[0]/A.length,a[1]+p[1]/A.length]},[0,0]));
   c.beginPath();c.arc(q[0],q[1],2.6,0,7);c.fillStyle='#fff';c.fill();c.strokeStyle='#109040';c.lineWidth=0.3;c.stroke();text(String(i+1),q[0],q[1]+0.1,3,'center',1)});
@@ -428,19 +443,20 @@ function makeSheet(){
   c.beginPath();c.moveTo(x0+c1,y);c.lineTo(x0+c1,y+rh);c.stroke();
   text(r[0],x0+c1/2,y+rh/2,2.4,'center');text(r[1],x0+c1+1.5,y+rh/2+0.9,2.3)});
  // 방위표·축척 막대
- var nx=x0-12,ny=y0+3;poly([[nx,ny],[nx-3,ny+10],[nx,ny+7.6],[nx+3,ny+10]],'#000');text('N',nx,ny-0.8,4,'center',1);
+ var nx=x0-12,ny=y0+3;c.fillStyle='rgba(255,255,255,.85)';c.fillRect(nx-5,ny-5.5,10,17);poly([[nx,ny],[nx-3,ny+10],[nx,ny+7.6],[nx+3,ny+10]],'#000');text('N',nx,ny-0.8,4,'center',1);
  var sb=Math.pow(10,Math.floor(Math.log10(SC*40/1000))),L=sb*1000/SC,bx=IL+6,by=IB-6;
- c.lineWidth=0.3;c.strokeRect(bx,by,L,1.5);c.fillStyle='#000';c.fillRect(bx,by,L/2,1.5);text('0',bx,by-1,2.2,'center');text(f(sb)+'m',bx+L,by-1,2.2,'center');
+ c.fillStyle='rgba(255,255,255,.85)';c.fillRect(bx-4,by-5,L+8,8);
+ c.lineWidth=0.3;c.strokeStyle='#000';c.strokeRect(bx,by,L,1.5);c.fillStyle='#000';c.fillRect(bx,by,L/2,1.5);text('0',bx,by-1,2.2,'center');text(f(sb)+'m',bx+L,by-1,2.2,'center');
  return cv;
 }
-var jspdfP=null;
+var jspdfP=null,sheetNote='';
 function loadPdfLib(){return jspdfP||(jspdfP=new Promise(function(ok,no){var s=document.createElement('script');
  s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=function(){ok(window.jspdf.jsPDF)};s.onerror=function(){jspdfP=null;no(new Error('PDF 도구를 불러오지 못했습니다'))};document.head.appendChild(s)}))}
 $('b_pdf').onclick=async function(){
- var b=$('b_pdf');b.disabled=true;say('PDF 만드는 중…');
- try{var JsPDF=await loadPdfLib(),cv=makeSheet(),doc=new JsPDF({orientation:'landscape',unit:'mm',format:'a3'});
-  doc.addImage(cv.toDataURL('image/png'),'PNG',0,0,420,297,undefined,'FAST');
-  var d=new Date();doc.save('태양광배치도_'+S.addr.replace(/\s+/g,'_')+'_'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.pdf');say('')}
+ var b=$('b_pdf');b.disabled=true;say('위성사진 받아 PDF 만드는 중…');
+ try{var JsPDF=await loadPdfLib(),cv=await makeSheet(),doc=new JsPDF({orientation:'landscape',unit:'mm',format:'a3'});
+  doc.addImage(cv.toDataURL('image/jpeg',0.9),'JPEG',0,0,420,297,undefined,'FAST');
+  var d=new Date();doc.save('태양광배치도_'+S.addr.replace(/\s+/g,'_')+'_'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.pdf');say(sheetNote,!!sheetNote)}
  catch(e){say(e.message,true)}
  b.disabled=false};
 $('go').onclick=run;
