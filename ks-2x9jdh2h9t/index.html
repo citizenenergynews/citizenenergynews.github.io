@@ -34,6 +34,7 @@ tr.sum td{font-weight:bold;background:#eef2f7;color:var(--g)}
 .tools{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .bd{fill:rgba(255,220,0,.12);stroke:#ffd800;stroke-width:1.5;cursor:pointer;vector-effect:non-scaling-stroke}
 .bd:hover{fill:rgba(255,220,0,.3)}
+.bx{stroke-dasharray:6 3}
 .pc{fill:none;stroke:#ff3030;stroke-width:2.5;pointer-events:none;vector-effect:non-scaling-stroke}
 .zn{fill:rgba(0,140,255,.18);stroke:#00a0ff;stroke-width:2;pointer-events:none;vector-effect:non-scaling-stroke}
 .md{fill:rgba(20,60,200,.8);stroke:#cfe0ff;stroke-width:.4;pointer-events:none;vector-effect:non-scaling-stroke}
@@ -57,7 +58,7 @@ a.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--g
 <p class="note">주소를 넣으면 필지·건물·용도지역과 한전 계통 여유를 보여 주고, 지붕(건물)을 눌러 모듈을 자동으로 배치한 뒤 회사 도곽 A3 배치도(PDF)로 내려받습니다. 검토용 가배치이며 제출 도면은 현장 확인 뒤 다시 그립니다.</p>
 
 <div class="q"><input id="addr" placeholder="예) 부산 사하구 하신중앙로 180 또는 지번 주소" autocomplete="off"><button class="main" id="go">검토</button></div>
-<div class="q hide" id="q2" style="margin-top:6px"><input id="addr2" placeholder="주소 추가 — 같은 학교·공장의 다른 지번 등 붙어 있는 필지" autocomplete="off"><button id="go2">필지 추가</button></div>
+<div class="q hide" id="q2" style="margin-top:6px"><input id="addr2" placeholder="주소 추가 — 같은 학교·공장의 다른 지번 등 붙어 있는 필지" autocomplete="off"><button id="go2">필지 추가</button><button id="b_pick">지도에서 필지 고르기</button></div>
 <div class="msg" id="msg"></div>
 
 <div id="res" class="hide">
@@ -139,13 +140,14 @@ var S={};   // site: pt, pnu, addr, parcel(ll), bldgs[], zones[], grid
 function ring(g){var c=g.coordinates;if(g.type=='MultiPolygon')c=c[0];return c[0].map(function(p){return [+p[0],+p[1]]})}
 
 // 필지 하나 불러오기(주소 → 필지 경계·토지특성·토지이용계획)
-async function fetchLot(q){
+async function fetchLot(q,at){   // q = 주소, 또는 at = 지도에서 누른 점 {x:경도,y:위도}
  if(!VK)throw new Error('브이월드 인증키가 아직 없습니다(페이지 설정 필요)');
- var pt=await search(q);
+ var pt=at||await search(q);
  say('필지 불러오는 중…');
  var pf=feats(await vw('/req/data',{service:'data',request:'GetFeature',data:'LP_PA_CBND_BUBUN',geomFilter:'POINT('+pt.x+' '+pt.y+')',crs:'EPSG:4326',size:'1',geometry:'true'}));
- if(!pf.length)throw new Error('필지를 찾지 못했습니다');
- var pp=pf[0].properties,lot={pt:pt,pnu:pp.pnu,addr:pp.addr,parcel:ring(pf[0].geometry)};
+ if(!pf.length)throw new Error('그 자리에서 필지를 찾지 못했습니다');
+ var pp=pf[0].properties;if(!pt.label)pt.label=pp.addr;
+ var lot={pt:pt,pnu:pp.pnu,addr:pp.addr,parcel:ring(pf[0].geometry)};
  var r=await Promise.all([
   vw('/ned/data/getLandCharacteristics',{pnu:lot.pnu,numOfRows:'20'}).catch(function(){return {}}),
   vw('/ned/data/getLandUseAttr',{pnu:lot.pnu,numOfRows:'100'}).catch(function(){return {}})]);
@@ -159,17 +161,26 @@ async function loadArea(){
  var bb=[Math.min.apply(0,xs),Math.min.apply(0,ys),Math.max.apply(0,xs),Math.max.apply(0,ys)];
  if(bb[2]-bb[0]>0.02||bb[3]-bb[1]>0.02)throw new Error('필지끼리 2km 넘게 떨어져 있어 한 지도에 담지 않습니다. 따로 검토하세요');
  var mx=(bb[2]-bb[0])*0.08+0.00009,my=(bb[3]-bb[1])*0.08+0.00007;   // 필지 둘레 8%+약 8m만(261127 사용자 "불필요한 부분이 너무 많아")
+ if(picking){mx=(bb[2]-bb[0])*0.3+0.0005;my=(bb[3]-bb[1])*0.3+0.0004}   // 지도에서 필지 고를 때는 둘레 약 45m 더 보여 줌
  S.view=[bb[0]-mx,bb[1]-my,bb[2]+mx,bb[3]+my];
  say('건물 불러오는 중…');
  S.zones.forEach(function(z){if(z.b!=null&&S.bldgs[z.b])z.bk=S.bldgs[z.b].ll[0].join(',');z.mods=null});
- var r=await vw('/req/data',{service:'data',request:'GetFeature',data:'LT_C_BLDGINFO',geomFilter:'BOX('+S.view.join(',')+')',crs:'EPSG:4326',size:'1000',geometry:'true'}).catch(function(){return {}});
- S.bldgs=feats(r).map(function(ft){var p=ft.properties;return {ll:ring(ft.geometry),name:p.bld_nm||'',dong:p.dong_nm||'',fl:p.grnd_flr||'',use:p.usability||''}});
+ var box={service:'data',request:'GetFeature',geomFilter:'BOX('+S.view.join(',')+')',crs:'EPSG:4326',size:'1000',geometry:'true'};
+ var r=await Promise.all([vw('/req/data',Object.assign({data:'LT_C_BLDGINFO'},box)).catch(function(){return {}}),
+  vw('/req/data',Object.assign({data:'LT_C_SPBD'},box)).catch(function(){return {}})]);
+ S.bldgs=feats(r[0]).map(function(ft){var p=ft.properties;return {ll:ring(ft.geometry),name:p.bld_nm||'',dong:p.dong_nm||'',fl:p.grnd_flr||'',use:p.usability||''}});
+ // 건물정보에 빠진 지붕은 도로명주소 건물 경계로 채움(261127 사용자 "오른쪽 지붕을 자동인식 안 했지만…")
+ var cen=function(P){var x=0,y=0;P.forEach(function(p){x+=p[0];y+=p[1]});return [x/P.length,y/P.length]};
+ feats(r[1]).forEach(function(ft){var P=ring(ft.geometry),c=cen(P);
+  if(S.bldgs.some(function(b){return inPoly(c,b.ll)||inPoly(cen(b.ll),P)}))return;
+  var p=ft.properties;S.bldgs.push({ll:P,name:p.buld_nm||'',dong:p.buld_nm_dc||'',fl:p.gro_flo_co||'',use:'',extra:1})});
  S.zones.forEach(function(z){if(z.bk){var k=S.bldgs.findIndex(function(b){return b.ll[0].join(',')==z.bk});z.b=k>=0?k:null}});
  showSite();drawMap();if(S.zones.length)layout();
 }
 async function run(){
  var q=$('addr').value.trim();if(!q)return;
  $('go').disabled=true;$('res').className='hide';$('q2').className='q hide';say('주소 찾는 중…');
+ picking=false;$('b_pick').textContent='지도에서 필지 고르기';$('b_pick').className='';$('map').style.cursor='';
  try{
   var lot=await fetchLot(q);
   S={lots:[lot],pt:lot.pt,pnu:lot.pnu,addr:lot.addr,parcel:lot.parcel,zones:[],bldgs:[],grid:null,lat:lot.pt.y};
@@ -179,17 +190,29 @@ async function run(){
  }catch(e){say(e.message,true)}
  $('go').disabled=false;
 }
-async function addLot(){
- var q=$('addr2').value.trim();if(!q||!S.lots)return;
- $('go2').disabled=true;say('추가 주소 찾는 중…');
+var picking=false,busy=false;
+async function addLot(at){
+ var q=at?'':$('addr2').value.trim();if((!q&&!at)||!S.lots||busy)return;
+ busy=true;$('go2').disabled=true;say(at?'누른 자리 필지 찾는 중…':'추가 주소 찾는 중…');
  try{
-  var lot=await fetchLot(q);
-  if(S.lots.some(function(l){return l.pnu==lot.pnu}))throw new Error('이미 들어 있는 필지입니다('+lot.addr+')');
-  S.lots.push(lot);
-  try{await loadArea()}catch(e){S.lots.pop();await loadArea();throw e}
-  $('addr2').value='';var m=lot.addr+' 추가함 — 필지 '+S.lots.length+'개';if(S.zones.length)afterMsg=m;else say(m)
+  var lot=await fetchLot(q,at),k=S.lots.findIndex(function(l){return l.pnu==lot.pnu});
+  if(k==0)throw new Error('처음 주소 필지입니다('+lot.addr+')');
+  if(k>0){   // 지도에서 이미 넣은 필지를 다시 누르면 뺌
+   if(!at)throw new Error('이미 들어 있는 필지입니다('+lot.addr+')');
+   S.lots.splice(k,1);await loadArea();afterMsg=lot.addr+' 뺌 — 필지 '+S.lots.length+'개';if(!S.zones.length)say(afterMsg)}
+  else{
+   S.lots.push(lot);
+   try{await loadArea()}catch(e){S.lots.pop();await loadArea();throw e}
+   if(!at)$('addr2').value='';var m=lot.addr+' 추가함 — 필지 '+S.lots.length+'개'+(picking?' (계속 누르거나 고르기 끝)':'');if(S.zones.length)afterMsg=m;else say(m)}
  }catch(e){say(e.message,true)}
- $('go2').disabled=false;
+ busy=false;$('go2').disabled=false;
+}
+async function setPick(on){
+ if(on&&drawing)cancelDraw();
+ picking=on;var b=$('b_pick');b.textContent=on?'고르기 끝':'지도에서 필지 고르기';b.className=on?'main':'';
+ $('map').style.cursor=on?'copy':'';
+ try{await loadArea()}catch(e){}
+ if(on)say('지도에서 넣을 필지를 누르세요. 넣은 필지를 다시 누르면 빠집니다. 다 고르면 [고르기 끝]');else say('')
 }
 async function dropLot(i){S.lots.splice(i,1);try{await loadArea();say('')}catch(e){say(e.message,true)}}
 
@@ -261,7 +284,7 @@ function drawMap(){
   t+='<image href="https://api.vworld.kr/req/wmts/1.0.0/'+VK+'/Satellite/'+Z+'/'+y+'/'+x+'.jpeg" x="'+(x*256-O.x)+'" y="'+(y*256-O.y)+'" width="256" height="256"/>';
  svg.innerHTML='<g>'+t+'</g><g id="g_b"></g><g id="g_z"></g><g id="g_m"></g><g id="g_d"></g>';
  var gb='';
- S.bldgs.forEach(function(b,i){gb+='<polygon class="bd" data-i="'+i+'" points="'+pts(b.ll)+'"><title>'+esc((b.name+' '+b.dong).trim()||'건물')+(b.fl?' · 지상 '+b.fl+'층':'')+'</title></polygon>'});
+ S.bldgs.forEach(function(b,i){gb+='<polygon class="bd'+(b.extra?' bx':'')+'" data-i="'+i+'" points="'+pts(b.ll)+'"><title>'+esc((b.name+' '+b.dong).trim()||'건물')+(b.fl?' · 지상 '+b.fl+'층':'')+'</title></polygon>'});
  parcels().forEach(function(P){gb+='<polygon class="pc" points="'+pts(P)+'"/>'});
  $('g_b').innerHTML=gb;
  redraw();
@@ -301,7 +324,7 @@ function showDraw(){
  $('g_d').innerHTML=g;
  var n=drawing?drawing.length:0;$('b_undo').disabled=!n;$('b_end').disabled=!(dmode=='poly'&&n>=3);$('b_cancel').disabled=!drawing;
 }
-function startDraw(m){drawing=[];dmode=m;hover=null;showDraw();
+function startDraw(m){if(picking)setPick(false);drawing=[];dmode=m;hover=null;showDraw();
  say(m=='rect'?'① 지붕 한 변의 양 끝을 누르고 ② 반대쪽 변 아무 곳을 누르면 사각형이 됩니다':'꼭짓점을 차례로 누르세요. 처음 점(노란 점)을 다시 누르거나 두 번 누르면 끝납니다')}
 function addZone(ll,name){S.zones.push(newZone({ll:ll,name:name}));drawing=null;dmode='';hover=null;showDraw();say('');layout()}
 function endDraw(){
@@ -320,6 +343,7 @@ svgEl.addEventListener('mousedown',function(ev){if(ev.button===0)drag={x:ev.clie
 window.addEventListener('mouseup',function(){setTimeout(function(){drag=null},0)});
 svgEl.addEventListener('click',function(ev){
  if(drag&&drag.moved)return;
+ if(picking){var q0=svgXY(ev),ll=unpx(q0[0],q0[1]);addLot({x:ll[0],y:ll[1]});return}
  if(drawing){
   var s=snap(svgXY(ev));
   if(s.close){endDraw();return}
@@ -496,8 +520,9 @@ $('b_pdf').onclick=async function(){
  b.disabled=false};
 $('go').onclick=run;
 $('addr').addEventListener('keydown',function(e){if(e.key=='Enter')run()});
-$('go2').onclick=addLot;
+$('go2').onclick=function(){addLot()};
 $('addr2').addEventListener('keydown',function(e){if(e.key=='Enter')addLot()});
+$('b_pick').onclick=function(){setPick(!picking);if(picking)$('map').scrollIntoView({block:'center'})};
 $('t_site').addEventListener('click',function(ev){var i=ev.target.getAttribute('data-lot');if(i!=null)dropLot(+i)});
 </script>
 </body>
