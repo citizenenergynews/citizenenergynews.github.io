@@ -172,7 +172,11 @@ async function loadArea(){
  // 건물정보에 빠진 지붕은 도로명주소 건물 경계로 채움(261127 사용자 "오른쪽 지붕을 자동인식 안 했지만…")
  var cen=function(P){var x=0,y=0;P.forEach(function(p){x+=p[0];y+=p[1]});return [x/P.length,y/P.length]};
  feats(r[1]).forEach(function(ft){var P=ring(ft.geometry),c=cen(P);
-  if(S.bldgs.some(function(b){return inPoly(c,b.ll)||inPoly(cen(b.ll),P)}))return;
+  // 기존 건물과 겹치는 넓이가 60% 이상일 때만 버림(가운데 점만 보면 큰 경계가 통째로 빠짐 — 261127 사용자 "새 영역 자동 인식 안 해")
+  var xs=P.map(function(p){return p[0]}),ys=P.map(function(p){return p[1]}),x0=Math.min.apply(0,xs),x1=Math.max.apply(0,xs),y0=Math.min.apply(0,ys),y1=Math.max.apply(0,ys),tot=0,hit=0;
+  for(var i=0;i<12;i++)for(var j=0;j<12;j++){var q=[x0+(x1-x0)*(i+.5)/12,y0+(y1-y0)*(j+.5)/12];if(!inPoly(q,P))continue;tot++;
+   if(S.bldgs.some(function(b){return !b.extra&&inPoly(q,b.ll)}))hit++}
+  if(!tot||hit/tot>=0.6)return;
   var p=ft.properties;S.bldgs.push({ll:P,name:p.buld_nm||'',dong:p.buld_nm_dc||'',fl:p.gro_flo_co||'',use:'',extra:1})});
  S.zones.forEach(function(z){if(z.bk){var k=S.bldgs.findIndex(function(b){return b.ll[0].join(',')==z.bk});z.b=k>=0?k:null}});
  showSite();drawMap();if(S.zones.length)layout();
