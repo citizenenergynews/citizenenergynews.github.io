@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>국민솔라 태양광발전소 경제성 분석</title>
+<style>
+:root{--g:#002060;--r:#c00000;--bg:#ffffff;--line:#c8d3e0;--head:#dce6f1;--in:#fafaac;--tx:#262626}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--tx);font-size:15px}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+h1{font-size:21px;color:var(--r);margin:8px 0 4px;padding-left:10px;border-left:5px solid var(--r)}
+.note{color:#666;font-size:13px;margin:0 0 16px}
+h2{font-size:16px;margin:22px 0 8px;color:var(--g);padding-left:8px;border-left:4px solid var(--r)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 8px}
+th{background:var(--head);color:var(--g);font-weight:bold;text-align:center}
+td.n{text-align:right;white-space:nowrap}
+td.c{text-align:center}
+tr.sum td{font-weight:bold;background:#eef2f7;color:var(--g)}
+tr.sub td:first-child{padding-left:22px;color:#444}
+td input{font-size:15px;width:110px;padding:3px 6px;border:1px solid #bbb;border-radius:4px;background:var(--in);text-align:right}
+td.big input{font-size:18px;width:130px;font-weight:bold}
+.foot{color:#666;font-size:12px;margin:18px 0 30px;line-height:1.6}
+.top{display:flex;align-items:center;gap:14px;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--g)}
+.logo{display:block;flex:none;width:200px;height:auto;max-width:42%}
+.top h1{flex:1;min-width:0;margin:0 0 5px;line-height:1.2;word-break:keep-all;align-self:flex-end}
+.pbtn{flex:none;display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid var(--g);border-radius:8px;background:#fff;color:var(--g);font-size:13px;font-weight:bold;cursor:pointer}
+.pbtn:hover{background:var(--head)}
+.pbtn svg{width:20px;height:20px}
+.rst{font-size:12px;color:var(--g);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;margin-left:6px}
+@media(max-width:520px){.top{flex-wrap:wrap;justify-content:space-between;gap:8px}.logo{width:170px;max-width:60%}.top h1{order:3;flex:0 0 100%;font-size:18px;margin:0;align-self:auto}th,td{word-break:keep-all}table{font-size:12px}th,td{padding:4px 5px}td input{width:84px;font-size:14px}td.big input{width:100px}.pbtn span{display:none}}
+@page{size:A4;margin:12mm}
+@media print{
+ body{background:#fff;font-size:12px}
+ .wrap{max-width:none;padding:0}
+ .pbtn,.rst{display:none}
+ td input{border:none;background:none;font-size:12px;width:90px}
+ h2{font-size:14px;margin:12px 0 5px}
+ table{font-size:11px}th,td{padding:2px 6px}
+ th,tr.sum td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ tr,h2{break-inside:avoid}h2{break-after:avoid}
+ .tw{overflow:visible}
+ .pg2{break-before:page;page-break-before:always;margin-top:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top">
+<img class="logo" src="logo.png" alt="국민솔라(주) — 주민주도 지역에너지 공공개발 회사" width="220" height="60">
+<h1>태양광발전소 경제성 분석</h1>
+<button class="pbtn" id="pbtn" type="button" title="인쇄 또는 PDF로 저장"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>인쇄·PDF</span></button>
+</div>
+<p class="note">노란 칸을 바꾸면 전부 다시 계산됩니다 · 금액은 만원 단위 반올림 · 세전<button class="rst" id="rst" type="button">처음 값으로</button></p>
+
+<h2>기본조건</h2>
+<div class="tw"><table>
+<tr><th>항목</th><th>값</th><th>단위</th><th>비고</th></tr>
+<tr><td>용량</td><td class="n big"><input id="i_kw" type="number" inputmode="decimal" min="0" step="any"></td><td class="c">kW</td><td id="b_mw"></td></tr>
+<tr><td>SMP</td><td class="n"><input id="i_smp" type="number" inputmode="decimal" step="any"></td><td class="c">원/kWh</td><td>계통한계가격</td></tr>
+<tr><td>REC</td><td class="n"><input id="i_rec" type="number" inputmode="decimal" step="any"></td><td class="c">원/kWh</td><td>가중치 1.0</td></tr>
+<tr class="sum"><td>단가 합계</td><td class="n" id="b_p"></td><td class="c">원/kWh</td><td>SMP + REC</td></tr>
+<tr><td>1kW 단가</td><td class="n"><input id="i_unit" type="number" inputmode="decimal" step="any"></td><td class="c">천원/kW</td><td>총공사비 기준</td></tr>
+<tr><td>대출비율</td><td class="n"><input id="i_pf" type="number" inputmode="decimal" step="any"></td><td class="c">%</td><td>나머지는 자기자본</td></tr>
+<tr class="sum"><td>총공사비</td><td class="n" id="b_cost"></td><td class="c">원</td><td id="b_costn"></td></tr>
+<tr class="sum"><td>총대출금</td><td class="n" id="b_loan"></td><td class="c">원</td><td id="b_loann"></td></tr>
+<tr><td>금리</td><td class="n"><input id="i_rate" type="number" inputmode="decimal" step="any"></td><td class="c">%/년</td><td>1년 거치 19년 분할 상환</td></tr>
+<tr><td>O&amp;M 비용</td><td class="n"><input id="i_om" type="number" inputmode="decimal" step="any"></td><td class="c">매출의 %</td><td id="b_omn"></td></tr>
+<tr><td>기타(부지임대료 등)</td><td class="n"><input id="i_etc" type="number" inputmode="decimal" step="any"></td><td class="c">매출의 %</td><td id="b_etcn"></td></tr>
+<tr><td>발전시간</td><td class="n" id="b_hr"></td><td class="c">hr/day</td><td>이용률 15% · 효율 해마다 0.5% 감소</td></tr>
+<tr><td>1년 발전량</td><td class="n" id="b_gen"></td><td class="c">MWh/년</td><td id="b_genn"></td></tr>
+<tr class="sum"><td>20년 수익</td><td class="n" id="b_net"></td><td class="c">원</td><td id="b_irr"></td></tr>
+</table></div>
+
+<h2>1. 20년 수익표</h2>
+<div class="tw"><table id="t_yr">
+<tr><th>연도</th><th>매출액(원)</th><th>지출(원)</th><th>수익(원)</th><th>수익 누계(원)</th></tr>
+</table></div>
+
+<h2 class="pg2">2. 지출표</h2>
+<div class="tw"><table id="t_exp">
+<tr><th>항목</th><th>20년 계(원)</th><th>연평균(원/년)</th><th>비중</th><th>산정 근거</th></tr>
+</table></div>
+
+<h2>3. 경제효과</h2>
+<div class="tw"><table id="t_eco">
+<tr><th>구분</th><th>효과</th><th>단위</th><th>산출근거</th></tr>
+</table></div>
+
+<h2>[참고] 환경적 효과(연간 기준)</h2>
+<div class="tw"><table id="t_env">
+<tr><th>구분</th><th>효과 요약</th><th>단위</th><th>비고/산출근거</th></tr>
+</table></div>
+
+<p class="foot">주) 생산유발계수(태양광 2.461), 부가가치유발계수(태양광 0.708), 고용유발계수(6.419명/10억원)는 한국에너지공단 2022년 「재생에너지 확대 시 에너지 관련 산업 등에 미치는 영향」 용역 보고서 계수를 적용(원본 엑셀 값 그대로).<br>
+전력배출계수 0.45941 tCO2eq/MWh(온실가스종합정보센터), 석유환산계수 0.23 TOE/MWh.<br><span id="foot"></span></p>
+</div>
+<script>
+// 원본: KS(범용) 국민솔라(10MW)종합 V11 261127.xlsx — (기준)황산공원 시트 값 그대로
+var D={kw:10000,smp:136.6,rec:49.6,unit:1750,pf:80,rate:4.8,om:10.7276,etc:17.164};
+var H={hr:3.6,deg:0.005,grace:1,repay:19,years:20,eco:{prod:2.461,va:0.708,job:6.419},co2:0.45941,toe:0.23};
+var K=['kw','smp','rec','unit','pf','rate','om','etc'];
+function $(i){return document.getElementById(i)}
+function f(n,d){return n.toLocaleString('ko-KR',{maximumFractionDigits:d||0})}
+function m(n){var s=n<0?'-':'';n=Math.abs(n);if(n<100000)return s+(n/10000).toLocaleString('ko-KR',{maximumFractionDigits:1})+'만';
+ var w=Math.round(n/10000),e=Math.floor(w/10000),r=w%10000;
+ return s+(e?e.toLocaleString('ko-KR')+'억'+(r?' '+r.toLocaleString('ko-KR')+'만':''):r.toLocaleString('ko-KR')+'만')}
+function pc(n,d){return (n*100).toFixed(d)+'%'}
+function irr(cf){var lo=-0.99,hi=1;function npv(r){var s=0;for(var i=0;i<cf.length;i++)s+=cf[i]/Math.pow(1+r,i);return s}
+ for(var k=0;k<200;k++){var x=(lo+hi)/2;if(npv(x)>0)lo=x;else hi=x}return (lo+hi)/2}
+function row(t,cells,cls){var tr=document.createElement('tr');if(cls)tr.className=cls;cells.forEach(function(c){var td=document.createElement('td');td.textContent=c[0];if(c[1])td.className=c[1];tr.appendChild(td)});t.appendChild(tr)}
+function clear(t){while(t.rows.length>1)t.deleteRow(1)}
+function v(k){var x=parseFloat($('i_'+k).value);return isFinite(x)?x:0}
+function calc(){
+ var kw=Math.max(v('kw'),0),smp=v('smp'),rec=v('rec'),price=smp+rec,cost=kw*v('unit')*1000,loan=cost*v('pf')/100,eq=cost-loan,
+  rate=v('rate')/100,om=v('om')/100,etc=v('etc')/100,dep=(eq-cost*(1-1/1.1))/H.repay;
+ var bal=loan,S={gen:0,rev:0,prin:0,int:0,om:0,etc:0,dep:0,exp:0,net:0},cf=[-eq],gen1=0,YR=[],cum=0;
+ for(var y=1;y<=H.years;y++){
+  var eff=1-H.deg*(y-1),gen=kw*H.hr*365/1000*eff,rev=gen*1000*price,prin=y<=H.grace?0:loan/H.repay,nb=bal-prin,
+   it=(bal+nb)/2*rate,o=rev*om,e=rev*etc,dp=y<=H.grace?0:dep,ex=prin+it+o+e+dp,net=rev-ex;
+  if(y==1)gen1=gen;bal=nb;cum+=net;
+  S.gen+=gen;S.rev+=rev;S.prin+=prin;S.int+=it;S.om+=o;S.etc+=e;S.dep+=dp;S.exp+=ex;S.net+=net;cf.push(net);YR.push([y,rev,ex,net,cum])}
+ var Y=H.years,r=(kw>0&&eq>0)?irr(cf):0;
+ $('b_mw').textContent=f(kw/1000,3)+'MW';
+ $('b_p').textContent=f(price,1);
+ $('b_cost').textContent=m(cost);$('b_costn').textContent='용량 × 1kW 단가';
+ $('b_loan').textContent=m(loan);$('b_loann').textContent='자기자본 '+m(eq)+'원';
+ $('b_omn').textContent='1년차 '+m(YR.length?YR[0][1]*om:0)+'원 (MW당 '+m(kw?YR[0][1]*om/kw*1000:0)+'원)';
+ $('b_etcn').textContent='1년차 '+m(YR.length?YR[0][1]*etc:0)+'원 (MW당 '+m(kw?YR[0][1]*etc/kw*1000:0)+'원)';
+ $('b_hr').textContent=H.hr;
+ $('b_gen').textContent=f(gen1);$('b_genn').textContent='첫해 · 20년 합계 '+f(S.gen)+'MWh';
+ $('b_net').textContent=m(S.net);$('b_irr').textContent='세전 · IRR '+pc(r,2)+' · 연평균 '+m(S.net/Y)+'원';
+ var yt=$('t_yr');clear(yt);
+ YR.forEach(function(e){row(yt,[[e[0]+'년차','c'],[m(e[1]),'n'],[m(e[2]),'n'],[m(e[3]),'n'],[m(e[4]),'n']])});
+ row(yt,[['합계','c'],[m(S.rev),'n'],[m(S.exp),'n'],[m(S.net),'n'],['','n']],'sum');
+ var t=$('t_exp');clear(t);var tot=S.exp||1;
+ [['원금 상환',S.prin,'대출 '+f(v('pf'),1)+'% · 1년 거치 19년 분할'],['금융이자',S.int,'연 '+f(v('rate'),2)+'%'],['O&M 비용',S.om,'매출의 '+f(v('om'),2)+'%'],
+  ['감가상각비',S.dep,'2년차부터 정액'],['기타(부지임대료 등)',S.etc,'매출의 '+f(v('etc'),2)+'%']].forEach(function(e){
+  row(t,[[e[0]],[m(e[1]),'n'],[m(e[1]/Y),'n'],[pc(e[1]/tot,1),'n'],[e[2]]])});
+ row(t,[['합계'],[m(S.exp),'n'],[m(S.exp/Y),'n'],['100.0%','n'],['']],'sum');
+ var c=$('t_eco');clear(c);var eok=cost/1e8;
+ row(c,[['생산유발효과'],[m(cost*H.eco.prod),'n'],['원','c'],['총공사비 × '+H.eco.prod]]);
+ row(c,[['부가가치유발'],[m(cost*H.eco.va),'n'],['원','c'],['총공사비 × '+H.eco.va]]);
+ row(c,[['고용유발효과'],[f(eok/10*H.eco.job,1),'n'],['명','c'],['총공사비(10억원) × '+H.eco.job+'명']]);
+ var en=$('t_env');clear(en);var mwh=gen1,t1=mwh*H.co2,sq=t1*1200;
+ row(en,[['탄소감축'],[f(t1,1),'n'],['tCO2','c'],['1년 발전량 '+f(mwh)+'MWh × 0.45941']]);
+ row(en,[['산림조성'],[f(sq/1000,1),'n'],['천㎡','c'],['tCO2 × 1,200㎡ = 축구장(7,140㎡) 약 '+f(sq/7140)+'개 면적']]);
+ row(en,[['조림효과'],[f(t1*360/1000,1),'n'],['천 그루','c'],['tCO2 × 360그루']]);
+ row(en,[['원유대체'],[f(mwh*H.toe,1),'n'],['TOE','c'],['발전량(MWh) × 0.23']]);
+ row(en,[['도시가구'],[f(mwh*1000/12/250),'n'],['가구','c'],['월 250kWh 쓰는 가구 기준']]);
+ $('foot').textContent='(2026-11-27 기준)';
+}
+function load(){K.forEach(function(k){$('i_'+k).value=D[k]});calc()}
+K.forEach(function(k){$('i_'+k).addEventListener('input',calc)});
+$('rst').addEventListener('click',load);
+load();
+$('pbtn').addEventListener('click',function(){window.print()});
+</script>
+</body>
+</html>
