@@ -30,12 +30,13 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 .fold summary span{font-size:12px;font-weight:normal;color:#888}
 .fold[open] summary span{display:none}
 .foot{color:#666;font-size:12px;margin:18px 0 30px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--g)}
-.logo{display:block;width:220px;height:auto;max-width:60%}
-.pbtn{flex:none;display:flex;align-items:center;gap:5px;margin-top:6px;padding:7px 10px;border:1px solid var(--g);border-radius:8px;background:#fff;color:var(--g);font-size:13px;font-weight:bold;cursor:pointer}
+.top{display:flex;align-items:center;gap:14px;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--g)}
+.logo{display:block;flex:none;width:200px;height:auto;max-width:42%}
+.top h1{flex:1;min-width:0;margin:0;line-height:1.35;word-break:keep-all}
+.pbtn{flex:none;display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid var(--g);border-radius:8px;background:#fff;color:var(--g);font-size:13px;font-weight:bold;cursor:pointer}
 .pbtn:hover{background:var(--head)}
 .pbtn svg{width:20px;height:20px}
-@media(max-width:520px){table{font-size:12px}th,td{padding:4px 5px}.inbox input{width:130px}.pbtn span{display:none}}
+@media(max-width:520px){.top{flex-wrap:wrap;justify-content:space-between;gap:8px}.logo{width:170px;max-width:60%}.top h1{order:3;flex:0 0 100%;font-size:18px}th,td{word-break:keep-all}table{font-size:12px}th,td{padding:4px 5px}.inbox input{width:130px}.pbtn span{display:none}}
 @page{size:A4;margin:12mm}
 @media print{
  body{background:#fff;font-size:12px}
@@ -56,9 +57,9 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <div class="wrap">
 <div class="top">
 <img class="logo" src="logo.png" alt="국민솔라(주) — 주민주도 지역에너지 공공개발 회사" width="220" height="60">
+<h1>국민솔라 공공개발 수익 배분 계산기</h1>
 <button class="pbtn" id="pbtn" type="button" title="인쇄 또는 PDF로 저장"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>인쇄·PDF</span></button>
 </div>
-<h1>국민솔라 공공개발 수익 배분 계산기</h1>
 <p class="note">설비용량(kW)만 넣으면 전부 다시 계산됩니다 · 금액은 만원 단위 반올림 · 세전</p>
 
 <div class="inbox">
