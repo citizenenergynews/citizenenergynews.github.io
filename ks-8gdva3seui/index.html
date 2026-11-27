@@ -25,6 +25,10 @@ td.n{text-align:right;white-space:nowrap}
 td.c{text-align:center}
 tr.sum td{font-weight:bold;background:#f0f4ef}
 tr.sub td:first-child{padding-left:22px;color:#444}
+.fold{margin:22px 0 0}
+.fold summary{font-size:16px;font-weight:bold;color:var(--g);cursor:pointer;margin-bottom:8px}
+.fold summary span{font-size:12px;font-weight:normal;color:#888}
+.fold[open] summary span{display:none}
 .foot{color:#666;font-size:12px;margin:18px 0 30px}
 @media(max-width:520px){table{font-size:12px}th,td{padding:4px 5px}.inbox input{width:130px}}
 </style>
@@ -54,11 +58,6 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <tr><td>발전량</td><td class="n" id="b_gen"></td><td class="c">MWh/년</td><td id="b_genn"></td></tr>
 </table></div>
 
-<h2>1-1. 지출표</h2>
-<div class="tw"><table id="t_exp">
-<tr><th>항목</th><th>20년 계(원)</th><th>연평균(원/년)</th><th>비중</th><th>산정 근거</th></tr>
-</table></div>
-
 <h2>2. 현금지급형 (kW당 25,000원)</h2>
 <div class="tw"><table id="t_cash">
 <tr><th>단계</th><th>금액(원)</th><th>비율</th><th>지급 시기</th></tr>
@@ -68,6 +67,13 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <div class="tw"><table id="t_eq">
 <tr><th>구분</th><th>지분율</th><th>출자액(원)</th><th>20년 순익 배분(원)</th><th>연평균(원/년)</th></tr>
 </table></div>
+
+<details class="fold">
+<summary>1-1. 지출표 <span>(눌러서 펼치기)</span></summary>
+<div class="tw"><table id="t_exp">
+<tr><th>항목</th><th>20년 계(원)</th><th>연평균(원/년)</th><th>비중</th><th>산정 근거</th></tr>
+</table></div>
+</details>
 
 <p class="foot" id="foot"></p>
 </div>
