@@ -83,13 +83,18 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <tr><th>단계</th><th>금액(원)</th><th>비율</th><th>지급 시기</th></tr>
 </table></div>
 
-<h2>2-1. 지분 참여형(공익사업비 포함)</h2>
+<h2>3. 지분 참여형(공익사업비 포함)</h2>
 <div class="tw"><table id="t_eq">
 <tr><th>구분</th><th>지분율</th><th>출자액(원)</th><th>20년 순익 배분(원)</th><th>연평균(원/년)</th></tr>
 </table></div>
 
+<h2>4. 연도별 계산(만원)</h2>
+<div class="tw"><table id="t_yr">
+<tr><th>연도</th><th>매출</th><th>지출</th><th>순익</th></tr>
+</table></div>
+
 <details class="fold">
-<summary>1-1. 지출표 <span>(눌러서 펼치기)</span></summary>
+<summary>5. 지출표 <span>(눌러서 펼치기)</span></summary>
 <div class="tw"><table id="t_exp">
 <tr><th>항목</th><th>20년 계(원)</th><th>연평균(원/년)</th><th>비중</th><th>산정 근거</th></tr>
 </table></div>
@@ -113,12 +118,12 @@ function clear(t){while(t.rows.length>1)t.deleteRow(1)}
 function calc(){
  var kw=parseFloat($('kw').value);if(!(kw>0))kw=0;
  var price=A.smp+A.rec*A.w,cost=kw*A.unit,loan=cost*A.pf,eq=cost-loan,dep=(eq-cost*(1-1/1.1))/A.repay;
- var bal=loan,S={gen:0,rev:0,prin:0,int:0,om:0,lease:0,dep:0,exp:0,net:0},cf=[-eq],gen1=0;
+ var bal=loan,S={gen:0,rev:0,prin:0,int:0,om:0,lease:0,dep:0,exp:0,net:0},cf=[-eq],gen1=0,YR=[];
  for(var y=1;y<=A.years;y++){
   var eff=1-A.deg*(y-1),gen=kw*A.hr*365/1000*eff,rev=gen*1000*price,prin=y<=A.grace?0:loan/A.repay,nb=bal-prin,
    it=(bal+nb)/2*A.rate,om=rev*A.om,ls=rev*A.lease,dp=y<=A.grace?0:dep,ex=prin+it+om+ls+dp,net=rev-ex;
   if(y==1)gen1=gen;bal=nb;
-  S.gen+=gen;S.rev+=rev;S.prin+=prin;S.int+=it;S.om+=om;S.lease+=ls;S.dep+=dp;S.exp+=ex;S.net+=net;cf.push(net)}
+  S.gen+=gen;S.rev+=rev;S.prin+=prin;S.int+=it;S.om+=om;S.lease+=ls;S.dep+=dp;S.exp+=ex;S.net+=net;cf.push(net);YR.push([y,rev,ex,net])}
  var Y=A.years,r=kw>0?irr(cf):0;
  $('mw').textContent=(kw/1000).toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:3})+'MW';
  $('b_kw').textContent=f(kw);$('b_mw').textContent=$('mw').textContent;
@@ -138,6 +143,9 @@ function calc(){
  [['(1) 착공',0.1,'착공 후 1주일 이내'],['(2) 완공',0.5,'완공 후 1주일 이내'],['(3) 계통연계',0.4,'계통연계 뒤 첫 수익 발생 시']].forEach(function(e){
   row(c,[[e[0]],[m(pay*e[1]),'n'],[pc(e[1],0),'c'],[e[2]]])});
  row(c,[['합계'],[m(pay),'n'],['100%','c'],['']],'sum');
+ var yt=$('t_yr');clear(yt);function w(n){return f(n/10000)}
+ YR.forEach(function(e){row(yt,[[e[0]+'년차','c'],[w(e[1]),'n'],[w(e[2]),'n'],[w(e[3]),'n']])});
+ row(yt,[['합계','c'],[w(S.rev),'n'],[w(S.exp),'n'],[w(S.net),'n']],'sum');
  var q=$('t_eq');clear(q);
  [['(1) 전략적 투자자',0.5,''],['(2) 국민솔라',0.5,''],['- 본사(KS분 50%의 30%)',0.15,'sub'],['- 경인(KS분 50%의 20%)',0.1,'sub'],['- 지역(KS분 50%의 50%)',0.25,'sub'],['합계',1,'sum']].forEach(function(e){
   row(q,[[e[0]],[pc(e[1],0),'c'],[m(eq*e[1]),'n'],[m(S.net*e[1]),'n'],[m(S.net*e[1]/Y),'n']],e[2])});
