@@ -88,10 +88,12 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <tr><th>구분</th><th>지분율</th><th>출자액(원)</th><th>20년 순익 배분(원)</th><th>연평균(원/년)</th></tr>
 </table></div>
 
-<h2>4. 연도별 계산(만원)</h2>
+<details class="fold">
+<summary>4. 연도별 계산(만원) <span>(눌러서 펼치기)</span></summary>
 <div class="tw"><table id="t_yr">
 <tr><th>연도</th><th>매출</th><th>지출</th><th>순익</th></tr>
 </table></div>
+</details>
 
 <details class="fold">
 <summary>5. 지출표 <span>(눌러서 펼치기)</span></summary>
@@ -152,9 +154,9 @@ function calc(){
  $('foot').textContent='※ 출자액 = 자기자본 '+m(eq)+'원 × 지분율 · 순익 배분 = 20년 순익(세전) × 지분율 · 가정: SMP '+A.smp+'·REC '+A.rec+'원/kWh, 발전 '+A.hr+'시간/일, 효율 저하 연 0.5%, kW당 사업비 '+m(A.unit)+'원, PF 80%·금리 4.8%·1년 거치 19년 분할 (2026-11-27 기준)';
 }
 $('kw').addEventListener('input',calc);calc();
-var fd=document.querySelector('.fold'),fo;
-window.addEventListener('beforeprint',function(){fo=fd.open;fd.open=true});
-window.addEventListener('afterprint',function(){fd.open=fo});
+var fds=[].slice.call(document.querySelectorAll('.fold')),fo=[];
+window.addEventListener('beforeprint',function(){fo=fds.map(function(d){var o=d.open;d.open=true;return o})});
+window.addEventListener('afterprint',function(){fds.forEach(function(d,i){d.open=fo[i]})});
 $('pbtn').addEventListener('click',function(){window.print()});
 </script>
 </body>
