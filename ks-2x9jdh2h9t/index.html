@@ -58,7 +58,7 @@ a.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--g
 <p class="note">주소를 넣으면 필지·건물·용도지역과 한전 계통 여유를 보여 주고, 지붕(건물)을 눌러 모듈을 자동으로 배치한 뒤 회사 도곽 A3 배치도(PDF)로 내려받습니다. 검토용 가배치이며 제출 도면은 현장 확인 뒤 다시 그립니다.</p>
 
 <div class="q"><input id="addr" placeholder="예) 부산 사하구 하신중앙로 180 또는 지번 주소" autocomplete="off"><button class="main" id="go">검토</button></div>
-<div class="q hide" id="q2" style="margin-top:6px"><input id="addr2" placeholder="주소 추가 — 같은 학교·공장의 다른 지번 등 붙어 있는 필지" autocomplete="off"><button id="go2">필지 추가</button><button id="b_pick">지도에서 필지 고르기</button></div>
+<div class="q hide" id="q2" style="margin-top:6px"><input id="addr2" placeholder="주소 추가 — 같은 학교·공장의 다른 지번 등 붙어 있는 필지" autocomplete="off"><button id="go2">필지 추가</button><button id="b_pick">지도에서 필지 고르기</button><label style="margin-left:8px;font-size:13px;white-space:nowrap"><input type="checkbox" id="auto60" checked> 필지 안에 60% 이상 든 지붕 자동으로 넣기</label></div>
 <div class="msg" id="msg"></div>
 
 <div id="res" class="hide">
@@ -179,8 +179,20 @@ async function loadArea(){
   if(!tot||hit/tot>=0.6)return;
   var p=ft.properties;S.bldgs.push({ll:P,name:p.buld_nm||'',dong:p.buld_nm_dc||'',fl:p.gro_flo_co||'',use:'',extra:1})});
  S.zones.forEach(function(z){if(z.bk){var k=S.bldgs.findIndex(function(b){return b.ll[0].join(',')==z.bk});z.b=k>=0?k:null}});
+ autoZones();
  showSite();drawMap();if(S.zones.length)layout();
 }
+// 필지(여러 개면 합친 것) 안에 넓이 60% 이상 든 건물은 구역으로 자동 넣음(261127 사용자 "지붕이 60%이상 들어가면 자동으로 인식하게, 나중에 뺄 수도 있게")
+// 한 번 넣은 건물은 S.seen에 적어 두어, 사용자가 뺀 건물을 필지 추가 때 다시 넣지 않음. 끄려면 칸 체크 해제(이 함수와 auto60 칸을 지우면 기능 전체가 빠짐)
+function autoZones(){
+ if(!$('auto60')||!$('auto60').checked)return;S.seen=S.seen||{};var P=parcels(),n=0;
+ S.bldgs.forEach(function(b,i){var key=b.ll[0].join(',');if(S.seen[key])return;
+  var xs=b.ll.map(function(p){return p[0]}),ys=b.ll.map(function(p){return p[1]}),x0=Math.min.apply(0,xs),x1=Math.max.apply(0,xs),y0=Math.min.apply(0,ys),y1=Math.max.apply(0,ys),tot=0,hit=0;
+  for(var a=0;a<12;a++)for(var c=0;c<12;c++){var q=[x0+(x1-x0)*(a+.5)/12,y0+(y1-y0)*(c+.5)/12];if(!inPoly(q,b.ll))continue;tot++;if(P.some(function(L){return inPoly(q,L)}))hit++}
+  if(!tot||hit/tot<0.6)return;
+  S.seen[key]=1;if(S.zones.some(function(z){return z.b===i}))return;
+  S.zones.push(newZone({auto:1,ll:b.ll,b:i,bk:key,name:(b.name+' '+b.dong).trim()||('자동 건물 '+(i+1))}));n++});
+ return n}
 async function run(){
  var q=$('addr').value.trim();if(!q)return;
  $('go').disabled=true;$('res').className='hide';$('q2').className='q hide';say('주소 찾는 중…');
@@ -524,6 +536,9 @@ $('go').onclick=run;
 $('addr').addEventListener('keydown',function(e){if(e.key=='Enter')run()});
 $('go2').onclick=function(){addLot()};
 $('addr2').addEventListener('keydown',function(e){if(e.key=='Enter')addLot()});
+$('auto60').onchange=function(){if(!S.lots)return;
+ if(this.checked){S.seen={};autoZones()}else S.zones=S.zones.filter(function(z){return !z.auto});
+ showSite();drawMap();layout()};
 $('b_pick').onclick=function(){setPick(!picking);if(picking)$('map').scrollIntoView({block:'center'})};
 $('t_site').addEventListener('click',function(ev){var i=ev.target.getAttribute('data-lot');if(i!=null)dropLot(+i)});
 </script>
