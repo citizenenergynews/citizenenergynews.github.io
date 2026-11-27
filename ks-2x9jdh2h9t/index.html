@@ -69,9 +69,9 @@ a.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--g
 <div id="grid"></div>
 
 <h2>3. 배치</h2>
-<p class="note">노란 선 = 건물(누르면 배치 구역으로 넣고 빼기), 빨간 선 = 필지. 모양이 다르면 <b>사각형 그리기</b>(지붕 네 모서리를 차례로 4번 누르면 끝 — 비스듬하거나 찌그러진 지붕도 그대로)나 <b>다각형 그리기</b>(처음 점을 다시 누르거나 두 번 눌러 끝), 건물 자료에 없는 지붕은 <b>지붕 누르기(사진 인식)</b> 뒤 지붕 한가운데를 누르면 위성사진 색으로 모양을 잡습니다. 점은 건물·필지 꼭짓점과 선에 저절로 붙고 길이(m)가 보입니다. 마우스 휠로 확대, 끌어서 이동, Backspace 되돌리기, Esc 취소.</p>
+<p class="note">노란 선 = 건물(누르면 배치 구역으로 넣고 빼기), 빨간 선 = 필지. 모양이 다르면 <b>사각형 그리기</b>(지붕 네 모서리를 차례로 4번 누르면 끝 — 비스듬하거나 찌그러진 지붕도 그대로)나 <b>다각형 그리기</b>(처음 점을 다시 누르거나 두 번 눌러 끝). 점은 건물·필지 꼭짓점과 선에 저절로 붙고 길이(m)가 보입니다. 마우스 휠로 확대, 끌어서 이동, Backspace 되돌리기, Esc 취소.</p>
 <div class="tools">
-<button id="b_rect">사각형 그리기(4번 클릭)</button><button id="b_poly">다각형 그리기</button><button id="b_auto">지붕 누르기(사진 인식)</button><button id="b_undo" disabled>되돌리기</button><button id="b_end" disabled>그리기 끝</button><button id="b_cancel" disabled>취소</button>
+<button id="b_rect">사각형 그리기(4번 클릭)</button><button id="b_poly">다각형 그리기</button><button id="b_undo" disabled>되돌리기</button><button id="b_end" disabled>그리기 끝</button><button id="b_cancel" disabled>취소</button>
 <button id="b_parcel">필지 전체를 구역으로</button><button id="b_clear">구역 모두 지우기</button>
 <span id="defbox" style="font-size:13px"></span>
 <span style="flex:1"></span><button id="b_zin" title="크게">＋</button><button id="b_zout" title="작게">－</button><button id="b_zall">전체</button>
@@ -212,7 +212,7 @@ async function addLot(at){
  busy=false;$('go2').disabled=false;
 }
 async function setPick(on){
- if(on&&drawing)cancelDraw();if(on&&finding)setFind(false);
+ if(on&&drawing)cancelDraw();
  picking=on;var b=$('b_pick');b.textContent=on?'고르기 끝':'지도에서 필지 고르기';b.className=on?'main':'';
  $('map').style.cursor=on?'copy':'';
  try{await loadArea()}catch(e){}
@@ -326,74 +326,12 @@ function showDraw(){
  $('g_d').innerHTML=g;
  var n=drawing?drawing.length:0;$('b_undo').disabled=!n;$('b_end').disabled=!(dmode=='poly'&&n>=3);$('b_cancel').disabled=!drawing;
 }
-function startDraw(m){if(picking)setPick(false);if(finding)setFind(false);drawing=[];dmode=m;hover=null;showDraw();
+function startDraw(m){if(picking)setPick(false);drawing=[];dmode=m;hover=null;showDraw();
  say(m=='rect'?'지붕 네 모서리를 차례로 누르세요(4번 누르면 끝, 261127 사용자 "4번 클릭으로")':'꼭짓점을 차례로 누르세요. 처음 점(노란 점)을 다시 누르거나 두 번 누르면 끝납니다')}
 function addZone(ll,name){S.zones.push(newZone({ll:ll,name:name}));drawing=null;dmode='';hover=null;showDraw();say('');layout()}
 function endDraw(){
  if(!drawing)return;var P=drawing.filter(function(p,i,A){return !i||meters(p,A[i-1])>0.2});   // 두 번 누른 같은 점 빼기
  if(P.length>=3)addZone(P,'그린 구역 '+(S.zones.length+1))}
-// 사진으로 지붕 찾기: 건물 자료에 없는 지붕(무허가·신축 등)을 위성사진 색으로 잡음(261127 사용자 "새 영역 자동 인식 안 해" — 두 건물 층 모두에 없는 지붕)
-var finding=false;
-function setFind(on){if(on){if(picking)setPick(false);if(drawing)cancelDraw()}finding=on;var b=$('b_auto');b.textContent=on?'지붕 찾기 끝':'지붕 누르기(사진 인식)';b.className=on?'main':'';$('map').style.cursor=on?'crosshair':'';
- say(on?'구역으로 넣을 지붕 한가운데를 누르세요. 같은 색으로 이어진 지붕을 찾아 구역으로 넣습니다(나무·마당이 섞이면 사각형 그리기로).':'')}
-async function findRoof(ll){
- if(busy)return;busy=true;say('위성사진에서 지붕 찾는 중…');
- try{
-  var z=19,n=Math.pow(2,z),R=3,W=(2*R+1)*256;   // 19단계 7×7장(한 변 약 400m)
-  var gx=(ll[0]+180)/360*n*256,sn=Math.sin(ll[1]*D2R),gy=(0.5-Math.log((1+sn)/(1-sn))/(4*Math.PI))*n*256;
-  var tx0=Math.floor(gx/256)-R,ty0=Math.floor(gy/256)-R,jobs=[];
-  for(var i=0;i<2*R+1;i++)for(var j=0;j<2*R+1;j++)(function(i,j){jobs.push(loadImg('https://api.vworld.kr/req/wmts/1.0.0/'+VK+'/Satellite/'+z+'/'+(ty0+j)+'/'+(tx0+i)+'.jpeg').then(function(im){return {im:im,i:i,j:j}}))})(i,j);
-  var tl=await Promise.all(jobs),cv=document.createElement('canvas');cv.width=cv.height=W;var c=cv.getContext('2d');
-  tl.forEach(function(t){if(t.im)c.drawImage(t.im,t.i*256,t.j*256)});
-  var d=c.getImageData(0,0,W,W).data,sx=Math.floor(gx-tx0*256),sy=Math.floor(gy-ty0*256);
-  // 3×3 평균으로 결 지우기
-  var L=new Float32Array(W*W*3);
-  for(var y=1;y<W-1;y++)for(var x=1;x<W-1;x++){var r=0,g=0,b=0;for(var dy=-1;dy<=1;dy++)for(var dx=-1;dx<=1;dx++){var k=((y+dy)*W+x+dx)*4;r+=d[k];g+=d[k+1];b+=d[k+2]}var o=(y*W+x)*3;L[o]=r/9;L[o+1]=g/9;L[o+2]=b/9}
-  var mr=0,mg=0,mb=0,cnt=0;for(var y=sy-3;y<=sy+3;y++)for(var x=sx-3;x<=sx+3;x++){var o=(y*W+x)*3;mr+=L[o];mg+=L[o+1];mb+=L[o+2];cnt++}
-  mr/=cnt;mg/=cnt;mb/=cnt;
-  var mpp=156543.03*Math.cos(ll[1]*D2R)/n,maxPx=Math.floor(30000/(mpp*mpp));   // 지붕 하나 최대 3만㎡
-  function grow(T){var seen=new Uint8Array(W*W),st=[sy*W+sx],area=0;seen[sy*W+sx]=1;
-   while(st.length){var q=st.pop(),x=q%W,y=(q-x)/W;area++;if(area>maxPx)return null;
-    if(x<2||y<2||x>W-3||y>W-3)return null;
-    [q-1,q+1,q-W,q+W].forEach(function(v){if(seen[v])return;var o=v*3,e=Math.hypot(L[o]-mr,L[o+1]-mg,L[o+2]-mb);if(e<T){seen[v]=1;st.push(v)}})}
-   return {m:seen,a:area}}
-  // 기준을 좁은 것부터 넓혀 가다 넓이가 갑자기 1.5배 넘게 뛰면(마당·도로로 샘) 그 앞에서 멈춤
-  var res=null,TS=[8,11,14,17,20,24,28,33];
-  for(var ti=0;ti<TS.length;ti++){var r2=grow(TS[ti]);if(!r2)break;if(res&&res.a*mpp*mpp>40&&r2.a>res.a*1.5)break;res=r2}
-  if(!res||res.a*mpp*mpp<30)throw new Error('지붕을 못 찾았습니다(색이 고르지 않거나 너무 큼). 사각형 그리기로 그려 주세요');
-  // 닫기(이음매·환기구 같은 작은 구멍 메움): 2칸 넓혔다 2칸 좁힘
-  function mor(M,grow){var o=new Uint8Array(W*W);for(var y=2;y<W-2;y++)for(var x=2;x<W-2;x++){var k=y*W+x,h=grow?0:1;
-   for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++){var v=M[k+dy*W+dx];if(grow&&v)h=1;if(!grow&&!v)h=0}o[k]=h}return o}
-  var M=mor(mor(res.m,true),false);   // 닫기: 이음매 메움
-  M=mor(mor(mor(mor(M,false),false),true),true);   // 열기: 1m 안쪽 가는 다리 끊음
-  (function(){var k0=sy*W+sx;if(!M[k0]){var bd=1e9;for(var k=0;k<W*W;k++)if(M[k]){var e=Math.abs(k%W-sx)+Math.abs((k/W|0)-sy);if(e<bd){bd=e;k0=k}}}   // 누른 자리와 이어진 덩어리만
-   var keep=new Uint8Array(W*W),st=[k0];keep[k0]=1;while(st.length){var q=st.pop();[q-1,q+1,q-W,q+W].forEach(function(v){if(M[v]&&!keep[v]){keep[v]=1;st.push(v)}})}M=keep})();
-  // 테두리 점 → 볼록 껍질 → 가장 작은 사각형
-  var P=[];for(var y=1;y<W-1;y++)for(var x=1;x<W-1;x++){var k=y*W+x;if(M[k]&&(!M[k-1]||!M[k+1]||!M[k-W]||!M[k+W]))P.push([x,y])}
-  P.sort(function(a,b){return a[0]-b[0]||a[1]-b[1]});
-  function cr(o,a,b){return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0])}
-  var lo=[],up=[];P.forEach(function(p){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)});
-  for(var i=P.length-1;i>=0;i--){var p=P[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
-  var H=lo.slice(0,-1).concat(up.slice(0,-1)),best=null;
-  for(var i=0;i<H.length;i++){var a=H[i],b=H[(i+1)%H.length],ux=b[0]-a[0],uy=b[1]-a[1],ul=Math.hypot(ux,uy);if(!ul)continue;ux/=ul;uy/=ul;
-   var u0=1e9,u1=-1e9,v0=1e9,v1=-1e9;H.forEach(function(p){var u=p[0]*ux+p[1]*uy,v=-p[0]*uy+p[1]*ux;u0=Math.min(u0,u);u1=Math.max(u1,u);v0=Math.min(v0,v);v1=Math.max(v1,v)});
-   var ar=(u1-u0)*(v1-v0);if(!best||ar<best.ar)best={ar:ar,ux:ux,uy:uy,u0:u0,u1:u1,v0:v0,v1:v1}}
-  var fill=0;for(var k=0;k<W*W;k++)fill+=M[k];
-  var pts;
-  if(fill/best.ar>0.85){var B=best;pts=[[B.u0,B.v0],[B.u1,B.v0],[B.u1,B.v1],[B.u0,B.v1]].map(function(t){return [t[0]*B.ux-t[1]*B.uy,t[0]*B.uy+t[1]*B.ux]})}
-  else{   // 네모가 아니면 껍질을 1m 기준으로 줄여 씀
-   var eps=1/mpp;function dp(A){if(A.length<3)return A;var a=A[0],b=A[A.length-1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,mi=0,md=0;
-    for(var i=1;i<A.length-1;i++){var e=Math.abs(cr(a,b,A[i]))/l;if(e>md){md=e;mi=i}}
-    return md>eps?dp(A.slice(0,mi+1)).slice(0,-1).concat(dp(A.slice(mi))):[a,b]}
-   var far=0,fd=0;H.forEach(function(p,i){var e=Math.hypot(p[0]-H[0][0],p[1]-H[0][1]);if(e>fd){fd=e;far=i}});   // 고리를 가장 먼 점에서 둘로 나눠 줄임
-   pts=dp(H.slice(0,far+1)).slice(0,-1).concat(dp(H.slice(far).concat([H[0]])).slice(0,-1))}
-  if(pts.length<3)throw new Error('지붕 모양을 잡지 못했습니다. 사각형 그리기로 그려 주세요');
-  var g2l=function(p){var X=(tx0*256+p[0])/(n*256),Y=(ty0*256+p[1])/(n*256),m=Math.PI-2*Math.PI*Y;return [X*360-180,Math.atan(Math.sinh(m))/D2R]};
-  var zl=pts.map(g2l);
-  busy=false;addZone(zl,'사진 인식 지붕 '+(S.zones.length+1));
-  say('지붕을 찾아 구역으로 넣었습니다(약 '+f(fill*mpp*mpp)+'㎡). 모양이 어긋나면 구역 표에서 빼고 사각형 그리기로 그리세요. 계속 누르거나 [지붕 찾기 끝]');
- }catch(e){say(e.message,true)}
- busy=false}
 function cancelDraw(){drawing=null;dmode='';hover=null;showDraw();say('')}
 function undo(){if(drawing&&drawing.length){drawing.pop();showDraw()}}
 var svgEl=$('map');
@@ -408,7 +346,6 @@ window.addEventListener('mouseup',function(){setTimeout(function(){drag=null},0)
 svgEl.addEventListener('click',function(ev){
  if(drag&&drag.moved)return;
  if(picking){var q0=svgXY(ev),ll=unpx(q0[0],q0[1]);addLot({x:ll[0],y:ll[1]});return}
- if(finding){var q1=svgXY(ev);findRoof(unpx(q1[0],q1[1]));return}
  if(drawing){
   var s=snap(svgXY(ev));
   if(s.close){endDraw();return}
@@ -430,7 +367,6 @@ document.addEventListener('keydown',function(ev){
  if(ev.key=='Escape')cancelDraw();else if(ev.key=='Enter')endDraw();else if(ev.key=='Backspace'||(ev.key=='z'&&ev.ctrlKey)){ev.preventDefault();undo()}});
 $('b_poly').onclick=function(){startDraw('poly')};
 $('b_rect').onclick=function(){startDraw('rect')};
-$('b_auto').onclick=function(){setFind(!finding)};
 $('b_undo').onclick=undo;$('b_end').onclick=endDraw;$('b_cancel').onclick=cancelDraw;
 $('b_zin').onclick=function(){zoom(0.7)};$('b_zout').onclick=function(){zoom(1/0.7)};$('b_zall').onclick=function(){setVB([0,0,S.wh[0],S.wh[1]]);if(drawing)showDraw()};
 $('b_parcel').onclick=function(){S.lots.forEach(function(L,i){S.zones.push(newZone({ll:L.parcel,name:'필지 전체'+(S.lots.length>1?' '+(i+1)+' ('+L.addr.split(' ').pop()+')':'')}))});layout()};
