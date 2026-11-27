@@ -160,7 +160,7 @@ async function loadArea(){
  var xs=[],ys=[];parcels().forEach(function(P){P.forEach(function(p){xs.push(p[0]);ys.push(p[1])})});
  var bb=[Math.min.apply(0,xs),Math.min.apply(0,ys),Math.max.apply(0,xs),Math.max.apply(0,ys)];
  if(bb[2]-bb[0]>0.02||bb[3]-bb[1]>0.02)throw new Error('필지끼리 2km 넘게 떨어져 있어 한 지도에 담지 않습니다. 따로 검토하세요');
- var mx=(bb[2]-bb[0])*0.08+0.00009,my=(bb[3]-bb[1])*0.08+0.00007;   // 필지 둘레 8%+약 8m만(261127 사용자 "불필요한 부분이 너무 많아")
+ var mx=(bb[2]-bb[0])*0.01+0.00002,my=(bb[3]-bb[1])*0.01+0.000018;   // 필지 끝선에 맞춤(둘레 약 2m, 261127 사용자 "필지 끝라인에 맞춰서")
  if(picking){mx=(bb[2]-bb[0])*0.3+0.0005;my=(bb[3]-bb[1])*0.3+0.0004}   // 지도에서 필지 고를 때는 둘레 약 45m 더 보여 줌
  S.view=[bb[0]-mx,bb[1]-my,bb[2]+mx,bb[3]+my];
  say('건물 불러오는 중…');
