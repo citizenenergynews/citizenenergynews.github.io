@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title>국민솔라 공공개발 수익 배분 계산기</title>
 <style>
-:root{--g:#1f487c;--r:#c00000;--bg:#f5f6f8;--line:#c8d3e0;--head:#dce6f1;--in:#fafaac;--tx:#262626}
+:root{--g:#002060;--r:#c00000;--bg:#ffffff;--line:#c8d3e0;--head:#dce6f1;--in:#fafaac;--tx:#262626}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--tx);font-size:15px}
 .wrap{max-width:860px;margin:0 auto;padding:16px}
@@ -30,7 +30,8 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 .fold summary span{font-size:12px;font-weight:normal;color:#888}
 .fold[open] summary span{display:none}
 .foot{color:#666;font-size:12px;margin:18px 0 30px}
-.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--g)}
+.logo{display:block;width:220px;height:auto;max-width:60%}
 .pbtn{flex:none;display:flex;align-items:center;gap:5px;margin-top:6px;padding:7px 10px;border:1px solid var(--g);border-radius:8px;background:#fff;color:var(--g);font-size:13px;font-weight:bold;cursor:pointer}
 .pbtn:hover{background:var(--head)}
 .pbtn svg{width:20px;height:20px}
@@ -43,7 +44,7 @@ tr.sub td:first-child{padding-left:22px;color:#444}
  .inbox{border-width:1px;padding:8px;margin-bottom:10px}
  .inbox input{font-size:16px;border:none;background:none;width:110px}
  h2,.fold summary{font-size:14px;margin:12px 0 5px}
- table{font-size:11px}th,td{padding:3px 6px}
+ table{font-size:11px}th,td{padding:2px 6px}
  th,tr.sum td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  tr,h2{break-inside:avoid}h2{break-after:avoid}
  .tw{overflow:visible}
@@ -54,9 +55,10 @@ tr.sub td:first-child{padding-left:22px;color:#444}
 <body>
 <div class="wrap">
 <div class="top">
-<h1>국민솔라 공공개발 수익 배분 계산기</h1>
+<img class="logo" src="logo.png" alt="국민솔라(주) — 주민주도 지역에너지 공공개발 회사" width="220" height="60">
 <button class="pbtn" id="pbtn" type="button" title="인쇄 또는 PDF로 저장"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>인쇄·PDF</span></button>
 </div>
+<h1>국민솔라 공공개발 수익 배분 계산기</h1>
 <p class="note">설비용량(kW)만 넣으면 전부 다시 계산됩니다 · 금액은 만원 단위 반올림 · 세전</p>
 
 <div class="inbox">
@@ -152,7 +154,7 @@ function calc(){
  var q=$('t_eq');clear(q);
  [['(1) 전략적 투자자',0.5,''],['(2) 국민솔라',0.5,''],['- 본사(KS분 50%의 30%)',0.15,'sub'],['- 경인(KS분 50%의 20%)',0.1,'sub'],['- 지역(KS분 50%의 50%)',0.25,'sub'],['합계',1,'sum']].forEach(function(e){
   row(q,[[e[0]],[pc(e[1],0),'c'],[m(eq*e[1]),'n'],[m(S.net*e[1]),'n'],[m(S.net*e[1]/Y),'n']],e[2])});
- $('foot').textContent='※ 출자액 = 자기자본 '+m(eq)+'원 × 지분율 · 순익 배분 = 20년 순익(세전) × 지분율 · 가정: SMP '+A.smp+'·REC '+A.rec+'원/kWh, 발전 '+A.hr+'시간/일, 효율 저하 연 0.5%, kW당 사업비 '+m(A.unit)+'원, PF 80%·금리 4.8%·1년 거치 19년 분할 (2026-11-27 기준)';
+ $('foot').textContent='(2026-11-27 기준)';
 }
 $('kw').addEventListener('input',calc);calc();
 var fds=[].slice.call(document.querySelectorAll('.fold')),fo=[];
