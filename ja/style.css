@@ -126,6 +126,9 @@ html[data-l=ZH] .ml-zh,html[data-l=EN] .ml-en{display:block}
 }
 
 /* GitHub Pages 추가 */
+/* 261127 사용자 "표 위주로": 본문 표 */
+.tbl{overflow-x:auto;margin:1em 0}.tbl table{border-collapse:collapse;width:100%;font-size:.92em;line-height:1.5}
+.tbl th,.tbl td{border:1px solid #d5d9d6;padding:6px 9px;text-align:left;vertical-align:top}.tbl th{background:#eef4ef;font-weight:600}
 /* 261117 사용자: 제호 앞 동그란 로고 */
 .mast>a{display:inline-flex;align-items:center;gap:14px}
 .mast-logo{width:clamp(40px,7vw,64px);height:auto;flex:none}
