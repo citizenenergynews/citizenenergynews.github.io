@@ -101,13 +101,21 @@ function say(t,err){var m=$('msg');m.textContent=t;m.className='msg'+(err?' err'
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
 // ---- 브이월드(JSONP) ----
-var cbn=0;
+var cbn=0,VDOWN='브이월드가 응답하지 않습니다 — 점검 중일 수 있습니다.',vwWait=null;
+// 점검·장애 때: 안내 + 1분마다 브이월드 확인, 살아나면 자동으로 다시 검토
+function vwDown(){
+ var m=$('msg');m.className='msg err';m.innerHTML=esc(VDOWN)+' <a href="https://www.vworld.kr/notice/serviceNotice.html" target="_blank" rel="noopener">점검 공지 보기</a><br>이 창을 열어 두면 1분마다 확인해 브이월드가 열리는 대로 자동으로 다시 검토합니다.';
+ if(vwWait)return;
+ vwWait=setInterval(function(){
+  vw('/req/search',{service:'search',request:'search',version:'2.0',size:'1',page:'1',query:'부산광역시청',type:'place'}).then(function(){
+   clearInterval(vwWait);vwWait=null;say('브이월드가 다시 열렸습니다 — 다시 검토합니다…');run()}).catch(function(){})},60000)}
 function vw(path,p){return new Promise(function(ok,no){
  var n='_vw'+(++cbn),s=document.createElement('script'),done=false;
  window[n]=function(d){done=true;delete window[n];s.remove();ok(d)};
  p.key=VK;p.domain=VD;p.format='json';p.callback=n;
  s.src='https://api.vworld.kr'+path+'?'+new URLSearchParams(p);
- s.onerror=function(){if(!done){delete window[n];no(new Error('브이월드 응답 없음'))}};
+ function down(){if(!done){done=true;delete window[n];s.remove();var e=new Error(VDOWN);e.vwDown=true;no(e)}}
+ s.onerror=down;s.onload=function(){setTimeout(down,0)};
  setTimeout(function(){if(!done){delete window[n];no(new Error('브이월드 시간 초과'))}},20000);
  document.head.appendChild(s)})}
 function feats(r){var x=r&&r.response&&r.response.result&&r.response.result.featureCollection;return x?x.features:[]}
@@ -203,7 +211,7 @@ async function run(){
   await loadArea();
   $('res').className='';$('q2').className='q';say('');
   grid();
- }catch(e){say(e.message,true)}
+ }catch(e){if(e.vwDown)vwDown();else say(e.message,true)}
  $('go').disabled=false;
 }
 var picking=false,busy=false;
