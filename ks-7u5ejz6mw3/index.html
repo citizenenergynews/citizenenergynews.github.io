@@ -62,13 +62,12 @@ td.big input{font-size:18px;width:130px;font-weight:bold}
 <h1>태양광발전소 경제성 분석</h1>
 <button class="pbtn" id="pbtn" type="button" title="인쇄 또는 PDF로 저장"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span>인쇄·PDF</span></button>
 </div>
-<p class="note">'조건 바꾸기'를 펼쳐 노란 칸을 바꾸면 전부 다시 계산됩니다 · 금액은 만원 단위 반올림 · 세전</p>
+<p class="note">기본조건의 용량, '조건 바꾸기'의 노란 칸을 바꾸면 전부 다시 계산됩니다 · 금액은 만원 단위 반올림 · 세전</p>
 
 <details class="fold inp">
 <summary>조건 바꾸기 <span>(눌러서 펼치기)</span></summary>
 <div class="tw"><table>
 <tr><th>항목</th><th>입력값</th><th>단위</th><th>비고</th></tr>
-<tr><td>용량</td><td class="n big"><input id="i_kw" type="number" inputmode="decimal" min="0" step="any"></td><td class="c">kW</td><td></td></tr>
 <tr><td>SMP</td><td class="n"><input id="i_smp" type="number" inputmode="decimal" step="any"></td><td class="c">원/kWh</td><td>계통한계가격</td></tr>
 <tr><td>REC</td><td class="n"><input id="i_rec" type="number" inputmode="decimal" step="any"></td><td class="c">원/kWh</td><td>가중치 1.0</td></tr>
 <tr><td>1kW 단가</td><td class="n"><input id="i_unit" type="number" inputmode="decimal" step="any"></td><td class="c">천원/kW</td><td>총공사비 기준</td></tr>
@@ -83,7 +82,7 @@ td.big input{font-size:18px;width:130px;font-weight:bold}
 <h2>기본조건</h2>
 <div class="tw"><table>
 <tr><th>항목</th><th>값</th><th>단위</th><th>비고</th></tr>
-<tr><td>용량</td><td class="n" id="b_kw"></td><td class="c">kW</td><td id="b_mw"></td></tr>
+<tr><td>용량</td><td class="n big"><input id="i_kw" type="number" inputmode="decimal" min="0" step="any"></td><td class="c">kW</td><td id="b_mw"></td></tr>
 <tr><td>단가</td><td class="n" id="b_p"></td><td class="c">원/kWh</td><td id="b_pn"></td></tr>
 <tr><td>1kW 단가</td><td class="n" id="b_unit"></td><td class="c">원/kW</td><td>총공사비 기준</td></tr>
 <tr><td>대출비율</td><td class="n" id="b_pf"></td><td class="c">%</td><td>나머지는 자기자본</td></tr>
@@ -147,7 +146,7 @@ function calc(){
   if(y==1)gen1=gen;bal=nb;cum+=net;
   S.gen+=gen;S.rev+=rev;S.prin+=prin;S.int+=it;S.om+=o;S.etc+=e;S.dep+=dp;S.exp+=ex;S.net+=net;cf.push(net);YR.push([y,rev,ex,net,cum])}
  var Y=H.years,r=(kw>0&&eq>0)?irr(cf):0;
- $('b_kw').textContent=f(kw);$('b_mw').textContent=f(kw/1000,3)+'MW';
+ $('b_mw').textContent=f(kw/1000,3)+'MW';
  $('b_p').textContent=f(price,1);$('b_pn').textContent='SMP '+f(smp,1)+' + REC '+f(rec,1);
  $('b_unit').textContent=m(v('unit')*1000);$('b_pf').textContent=f(v('pf'),1);$('b_rate').textContent=f(v('rate'),2);
  $('b_cost').textContent=m(cost);
