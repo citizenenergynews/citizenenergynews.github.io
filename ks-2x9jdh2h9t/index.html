@@ -57,6 +57,7 @@ a.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--g
 <p class="note">주소를 넣으면 필지·건물·용도지역과 한전 계통 여유를 보여 주고, 지붕(건물)을 눌러 모듈을 자동으로 배치한 뒤 회사 도곽 A3 배치도(PDF)로 내려받습니다. 검토용 가배치이며 제출 도면은 현장 확인 뒤 다시 그립니다.</p>
 
 <div class="q"><input id="addr" placeholder="예) 부산 사하구 하신중앙로 180 또는 지번 주소" autocomplete="off"><button class="main" id="go">검토</button></div>
+<div class="q hide" id="q2" style="margin-top:6px"><input id="addr2" placeholder="주소 추가 — 같은 학교·공장의 다른 지번 등 붙어 있는 필지" autocomplete="off"><button id="go2">필지 추가</button></div>
 <div class="msg" id="msg"></div>
 
 <div id="res" class="hide">
@@ -81,7 +82,7 @@ a.btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--g
 
 <p class="foot">모듈 650W(1,134×2,382mm), 가장자리 이격 0.5m, 모듈 사이 30mm. 기본 = 세로 3단 5°(회사 1차 가배치), 구역마다 놓기(세로·가로)·각도(0~30°)·단수(1~5단)를 고를 수 있음(넓은 지붕 예: 가로 1단 10°), 줄 간격은 동짓날 그림자와 점검 통로 0.9m 중 긴 쪽(회사 가배치 기준).<br>
 자료: 국토교통부 브이월드(주소·필지·건물·토지특성·토지이용계획·위성영상), 한국전력 전력데이터 개방포털(분산전원 연계정보). 한전 자료는 동·리 단위라 실제 연결 선로는 한전 협의로 확정합니다.<br>
-위성영상은 화면 확인용이며 내려받는 배치도에는 넣지 않습니다.</p>
+내려받는 배치도에도 위성영상을 깔아 줍니다. 필지가 여러 개면 위 '필지 추가'로 넣으세요(한전 계통은 처음 주소 기준).</p>
 </div>
 <script>
 var VK='CC5BA97B-3F14-4428-AE22-2403DD53DCC0', VD='localhost';   // 브이월드 인증키와 그 키에 등록된 도메인(261127 사용자 "이걸로해")
@@ -137,45 +138,78 @@ function unme(m){return [C0[0]+m[0]/(111320*Math.cos(C0[1]*D2R)),C0[1]+m[1]/1105
 var S={};   // site: pt, pnu, addr, parcel(ll), bldgs[], zones[], grid
 function ring(g){var c=g.coordinates;if(g.type=='MultiPolygon')c=c[0];return c[0].map(function(p){return [+p[0],+p[1]]})}
 
+// 필지 하나 불러오기(주소 → 필지 경계·토지특성·토지이용계획)
+async function fetchLot(q){
+ if(!VK)throw new Error('브이월드 인증키가 아직 없습니다(페이지 설정 필요)');
+ var pt=await search(q);
+ say('필지 불러오는 중…');
+ var pf=feats(await vw('/req/data',{service:'data',request:'GetFeature',data:'LP_PA_CBND_BUBUN',geomFilter:'POINT('+pt.x+' '+pt.y+')',crs:'EPSG:4326',size:'1',geometry:'true'}));
+ if(!pf.length)throw new Error('필지를 찾지 못했습니다');
+ var pp=pf[0].properties,lot={pt:pt,pnu:pp.pnu,addr:pp.addr,parcel:ring(pf[0].geometry)};
+ var r=await Promise.all([
+  vw('/ned/data/getLandCharacteristics',{pnu:lot.pnu,numOfRows:'20'}).catch(function(){return {}}),
+  vw('/ned/data/getLandUseAttr',{pnu:lot.pnu,numOfRows:'100'}).catch(function(){return {}})]);
+ lot.lc=nedRows(r[0]).sort(function(a,b){return (b.stdrYear||0)-(a.stdrYear||0)})[0]||{};
+ lot.lu=nedRows(r[1]);
+ return lot}
+function parcels(){return S.lots.map(function(l){return l.parcel})}
+// 모든 필지를 감싸는 범위로 지도·건물 다시 불러오기(구역은 그대로 두고 배치만 다시 계산)
+async function loadArea(){
+ var xs=[],ys=[];parcels().forEach(function(P){P.forEach(function(p){xs.push(p[0]);ys.push(p[1])})});
+ var bb=[Math.min.apply(0,xs),Math.min.apply(0,ys),Math.max.apply(0,xs),Math.max.apply(0,ys)];
+ if(bb[2]-bb[0]>0.02||bb[3]-bb[1]>0.02)throw new Error('필지끼리 2km 넘게 떨어져 있어 한 지도에 담지 않습니다. 따로 검토하세요');
+ var mx=(bb[2]-bb[0])*0.08+0.00009,my=(bb[3]-bb[1])*0.08+0.00007;   // 필지 둘레 8%+약 8m만(261127 사용자 "불필요한 부분이 너무 많아")
+ S.view=[bb[0]-mx,bb[1]-my,bb[2]+mx,bb[3]+my];
+ say('건물 불러오는 중…');
+ S.zones.forEach(function(z){if(z.b!=null&&S.bldgs[z.b])z.bk=S.bldgs[z.b].ll[0].join(',');z.mods=null});
+ var r=await vw('/req/data',{service:'data',request:'GetFeature',data:'LT_C_BLDGINFO',geomFilter:'BOX('+S.view.join(',')+')',crs:'EPSG:4326',size:'1000',geometry:'true'}).catch(function(){return {}});
+ S.bldgs=feats(r).map(function(ft){var p=ft.properties;return {ll:ring(ft.geometry),name:p.bld_nm||'',dong:p.dong_nm||'',fl:p.grnd_flr||'',use:p.usability||''}});
+ S.zones.forEach(function(z){if(z.bk){var k=S.bldgs.findIndex(function(b){return b.ll[0].join(',')==z.bk});z.b=k>=0?k:null}});
+ showSite();drawMap();if(S.zones.length)layout();
+}
 async function run(){
  var q=$('addr').value.trim();if(!q)return;
- $('go').disabled=true;$('res').className='hide';say('주소 찾는 중…');
+ $('go').disabled=true;$('res').className='hide';$('q2').className='q hide';say('주소 찾는 중…');
  try{
-  if(!VK)throw new Error('브이월드 인증키가 아직 없습니다(페이지 설정 필요)');
-  var pt=await search(q);
-  say('필지·건물 불러오는 중…');
-  var pf=feats(await vw('/req/data',{service:'data',request:'GetFeature',data:'LP_PA_CBND_BUBUN',geomFilter:'POINT('+pt.x+' '+pt.y+')',crs:'EPSG:4326',size:'1',geometry:'true'}));
-  if(!pf.length)throw new Error('필지를 찾지 못했습니다');
-  var pp=pf[0].properties;
-  S={pt:pt,pnu:pp.pnu,addr:pp.addr,parcel:ring(pf[0].geometry),zones:[],bldgs:[],grid:null,lat:pt.y};
-  var xs=S.parcel.map(function(p){return p[0]}),ys=S.parcel.map(function(p){return p[1]});
-  var bb=[Math.min.apply(0,xs),Math.min.apply(0,ys),Math.max.apply(0,xs),Math.max.apply(0,ys)];
-  var mx=(bb[2]-bb[0])*0.08+0.00009,my=(bb[3]-bb[1])*0.08+0.00007;   // 필지 둘레 8%+약 8m만(261127 사용자 "불필요한 부분이 너무 많아")
-  S.view=[bb[0]-mx,bb[1]-my,bb[2]+mx,bb[3]+my];
-  var r=await Promise.all([
-   vw('/ned/data/getLandCharacteristics',{pnu:S.pnu,numOfRows:'20'}).catch(function(){return {}}),
-   vw('/ned/data/getLandUseAttr',{pnu:S.pnu,numOfRows:'100'}).catch(function(){return {}}),
-   vw('/req/data',{service:'data',request:'GetFeature',data:'LT_C_BLDGINFO',geomFilter:'BOX('+S.view.join(',')+')',crs:'EPSG:4326',size:'1000',geometry:'true'}).catch(function(){return {}})]);
-  var lc=nedRows(r[0]).sort(function(a,b){return (b.stdrYear||0)-(a.stdrYear||0)})[0]||{};
-  var lu=nedRows(r[1]);
-  S.bldgs=feats(r[2]).map(function(ft){var p=ft.properties;return {ll:ring(ft.geometry),name:p.bld_nm||'',dong:p.dong_nm||'',fl:p.grnd_flr||'',use:p.usability||''}});
-  showSite(lc,lu);
-  drawMap();
-  $('res').className='';say('');
+  var lot=await fetchLot(q);
+  S={lots:[lot],pt:lot.pt,pnu:lot.pnu,addr:lot.addr,parcel:lot.parcel,zones:[],bldgs:[],grid:null,lat:lot.pt.y};
+  await loadArea();
+  $('res').className='';$('q2').className='q';say('');
   grid();
  }catch(e){say(e.message,true)}
  $('go').disabled=false;
 }
+async function addLot(){
+ var q=$('addr2').value.trim();if(!q||!S.lots)return;
+ $('go2').disabled=true;say('추가 주소 찾는 중…');
+ try{
+  var lot=await fetchLot(q);
+  if(S.lots.some(function(l){return l.pnu==lot.pnu}))throw new Error('이미 들어 있는 필지입니다('+lot.addr+')');
+  S.lots.push(lot);
+  try{await loadArea()}catch(e){S.lots.pop();await loadArea();throw e}
+  $('addr2').value='';var m=lot.addr+' 추가함 — 필지 '+S.lots.length+'개';if(S.zones.length)afterMsg=m;else say(m)
+ }catch(e){say(e.message,true)}
+ $('go2').disabled=false;
+}
+async function dropLot(i){S.lots.splice(i,1);try{await loadArea();say('')}catch(e){say(e.message,true)}}
 
-function showSite(lc,lu){
- var names={},rows=[['주소',S.pt.label],['지번',S.addr+(S.pnu.charAt(10)=='2'?' (산)':'')],
+function lotRows(L){
+ var lc=L.lc,names={},rows=[['주소',L.pt.label],['지번',L.addr+(L.pnu.charAt(10)=='2'?' (산)':'')],
   ['지목·면적',(lc.lndcgrCodeNm||'-')+' · '+(lc.lndpclAr?f(lc.lndpclAr)+'㎡':'-')],
   ['용도지역',(lc.prposArea1Nm||'-')+(lc.prposArea2Nm&&lc.prposArea2Nm!='지정되지않음'?' · '+lc.prposArea2Nm:'')],
   ['지형',(lc.tpgrphHgCodeNm||'-')+(lc.tpgrphFrmCodeNm?' · '+lc.tpgrphFrmCodeNm:'')]];
- lu.forEach(function(u){var n=u.prposAreaDstrcCodeNm;if(n&&!names[n])names[n]=u.cnflcAtNm||''});
+ L.lu.forEach(function(u){var n=u.prposAreaDstrcCodeNm;if(n&&!names[n])names[n]=u.cnflcAtNm||''});
  var ks=Object.keys(names);
  rows.push(['토지이용계획('+ks.length+')',ks.length?ks.map(function(k){return k+(names[k]?'('+names[k]+')':'')}).join(', '):'-']);
- $('t_site').innerHTML=rows.map(function(r){return '<tr><th style="width:150px">'+r[0]+'</th><td>'+esc(r[1])+'</td></tr>'}).join('');
+ return rows}
+function showSite(){
+ var n=S.lots.length,h='',sum=0;
+ S.lots.forEach(function(L,i){
+  if(n>1)h+='<tr><th colspan="2" style="text-align:left">필지 '+(i+1)+(i?' <button data-lot="'+i+'" style="margin-left:8px;padding:2px 8px;font-size:12px">빼기</button>':' (처음 주소 — 한전 계통 기준)')+'</th></tr>';
+  h+=lotRows(L).map(function(r){return '<tr><th style="width:150px">'+r[0]+'</th><td>'+esc(r[1])+'</td></tr>'}).join('');
+  sum+=+(L.lc.lndpclAr||0)});
+ if(n>1)h+='<tr class="sum"><td>필지 합계</td><td>'+n+'필지 · '+f(sum)+'㎡</td></tr>';
+ $('t_site').innerHTML=h;
 }
 
 // ---- 한전 ----
@@ -228,7 +262,7 @@ function drawMap(){
  svg.innerHTML='<g>'+t+'</g><g id="g_b"></g><g id="g_z"></g><g id="g_m"></g><g id="g_d"></g>';
  var gb='';
  S.bldgs.forEach(function(b,i){gb+='<polygon class="bd" data-i="'+i+'" points="'+pts(b.ll)+'"><title>'+esc((b.name+' '+b.dong).trim()||'건물')+(b.fl?' · 지상 '+b.fl+'층':'')+'</title></polygon>'});
- gb+='<polygon class="pc" points="'+pts(S.parcel)+'"/>';
+ parcels().forEach(function(P){gb+='<polygon class="pc" points="'+pts(P)+'"/>'});
  $('g_b').innerHTML=gb;
  redraw();
 }
@@ -240,7 +274,7 @@ function unit(){var r=$('map').getBoundingClientRect();return VB[2]/r.width}   /
 function snap(q){
  var lim=14*unit(),best=null,bd=lim,first=drawing&&drawing.length>=3&&dmode=='poly'?px(drawing[0][0],drawing[0][1]):null;
  if(first&&Math.hypot(first[0]-q[0],first[1]-q[1])<lim)return {p:first,close:true};
- var polys=S.bldgs.map(function(b){return b.ll}).concat([S.parcel]).concat(S.zones.map(function(z){return z.ll}));
+ var polys=S.bldgs.map(function(b){return b.ll}).concat(parcels()).concat(S.zones.map(function(z){return z.ll}));
  polys.forEach(function(P){for(var i=0;i<P.length;i++){var a=px(P[i][0],P[i][1]),d=Math.hypot(a[0]-q[0],a[1]-q[1]);if(d<bd){bd=d;best={p:a,v:1}}}});
  if(best)return best;
  bd=lim*0.6;
@@ -309,7 +343,7 @@ $('b_poly').onclick=function(){startDraw('poly')};
 $('b_rect').onclick=function(){startDraw('rect')};
 $('b_undo').onclick=undo;$('b_end').onclick=endDraw;$('b_cancel').onclick=cancelDraw;
 $('b_zin').onclick=function(){zoom(0.7)};$('b_zout').onclick=function(){zoom(1/0.7)};$('b_zall').onclick=function(){setVB([0,0,S.wh[0],S.wh[1]]);if(drawing)showDraw()};
-$('b_parcel').onclick=function(){S.zones.push(newZone({ll:S.parcel,name:'필지 전체'}));layout()};
+$('b_parcel').onclick=function(){S.lots.forEach(function(L,i){S.zones.push(newZone({ll:L.parcel,name:'필지 전체'+(S.lots.length>1?' '+(i+1)+' ('+L.addr.split(' ').pop()+')':'')}))});layout()};
 $('b_clear').onclick=function(){S.zones=[];layout()};
 
 // ---- 배치 계산(미터) ----
@@ -350,7 +384,8 @@ function area(P){var s=0;for(var i=0,j=P.length-1;i<P.length;j=i++)s+=(P[j][0]+P
 function total(){var n=0;S.zones.forEach(function(z){n+=z.n||0});return {n:n,kw:n*WATT/1000}}
 function layout(){
  say(S.zones.length?'배치 계산 중…':'');
- setTimeout(function(){S.zones.forEach(function(z){if(!z.mods)fill(z)});redraw();say('')},20)}
+ setTimeout(function(){S.zones.forEach(function(z){if(!z.mods)fill(z)});redraw();say(afterMsg);afterMsg=''},20)}
+var afterMsg='';   // 배치 다시 계산이 끝난 뒤 보여 줄 말
 function redraw(){
  var gz='',gm='';
  S.zones.forEach(function(z,i){
@@ -391,7 +426,7 @@ async function makeSheet(){
  var kp=PW/(DW.ext[2]-DW.ext[0]),F=function(x,y){return [x*kp,PH-y*kp]};          // 도곽 단위 → 종이 mm
  var IL=3442*kp,IR=269179*kp,IT=PH-189052*kp,IB=PH-15989*kp,ICX=(IL+IR)/2,ICY=(IT+IB)/2; // 안쪽 칸
  function mm(ll){var m=me(ll);return [m[0]*1000,m[1]*1000]}
- var all=S.parcel.map(mm);S.zones.forEach(function(z){all=all.concat(z.ll.map(mm))});
+ var all=[];parcels().forEach(function(P){all=all.concat(P.map(mm))});S.zones.forEach(function(z){all=all.concat(z.ll.map(mm))});
  var xs=all.map(function(p){return p[0]}),ys=all.map(function(p){return p[1]});
  var bx0=Math.min.apply(0,xs),bx1=Math.max.apply(0,xs),by0=Math.min.apply(0,ys),by1=Math.max.apply(0,ys);
  var SC=Math.ceil(Math.max((bx1-bx0+20000)/(IR-IL),(by1-by0+20000)/(IB-IT))/50)*50,cx=(bx0+bx1)/2,cy=(by0+by1)/2;
@@ -413,7 +448,7 @@ async function makeSheet(){
   var p=M(mm(tileLL(t.x,t.y,z))),q=M(mm(tileLL(t.x+1,t.y+1,z)));c.drawImage(t.im,p[0],p[1],q[0]-p[0]+0.03,q[1]-p[1]+0.03)});
  sheetNote=bad?('위성사진 '+bad+'/'+tiles.length+'장을 받지 못했습니다'):'';
  S.bldgs.forEach(function(b){poly(b.ll.map(mm).map(M),null,'rgba(255,255,255,.75)',0.15)});
- poly(S.parcel.map(mm).map(M),null,'#d0006f',0.45);
+ parcels().forEach(function(P){poly(P.map(mm).map(M),null,'#d0006f',0.45)});
  var ZS=S.zones.filter(function(z){return z.n});
  ZS.forEach(function(z){poly(z.ll.map(mm).map(M),'rgba(0,200,80,.12)','#20e060',0.35);
   z.mods.forEach(function(m){poly(m.map(function(p){return M([p[0]*1000,p[1]*1000])}),'#2f55c8','#ffffff',0.04)})});
@@ -431,7 +466,7 @@ async function makeSheet(){
  text(ds,PW*0.545,PH*(1-0.026),2.6,'center');
  // 사업개요 표(오른쪽 위)
  var t=total(),gl=S.grid?judge(t.kw):null,modes={};ZS.forEach(function(z){modes[zdesc(z)]=1});
- var rows=[['사 업 개 요',null],['주소',S.pt.label],['지번',S.addr],['모듈',WATT+'W (1,134×2,382) × '+f(t.n)+'장'],['총용량',f(t.kw,2)+' kW'],['구조',Object.keys(modes).join(' / ')],['이격','가장자리 0.5m, 줄 간격 동지 그림자·통로 0.9m 기준']];
+ var rows=[['사 업 개 요',null],['주소',S.pt.label],['지번',S.addr+(S.lots.length>1?' 외 '+(S.lots.length-1)+'필지 ('+S.lots.slice(1).map(function(L){return L.addr.split(' ').pop()}).join(', ')+')':'')],['모듈',WATT+'W (1,134×2,382) × '+f(t.n)+'장'],['총용량',f(t.kw,2)+' kW'],['구조',Object.keys(modes).join(' / ')],['이격','가장자리 0.5m, 줄 간격 동지 그림자·통로 0.9m 기준']];
  if(gl)rows.push(['계통',gl[0]+' '+gl[2]+' ('+S.gridLv+' 단위)']);
  rows.push(['구 역 별',null]);
  ZS.slice(0,15).forEach(function(z,i){rows.push([String(i+1),z.name+' · '+zdesc(z)+' · '+f(z.n)+'장 · '+f(z.n*WATT/1000,2)+'kW'])});
@@ -461,6 +496,9 @@ $('b_pdf').onclick=async function(){
  b.disabled=false};
 $('go').onclick=run;
 $('addr').addEventListener('keydown',function(e){if(e.key=='Enter')run()});
+$('go2').onclick=addLot;
+$('addr2').addEventListener('keydown',function(e){if(e.key=='Enter')addLot()});
+$('t_site').addEventListener('click',function(ev){var i=ev.target.getAttribute('data-lot');if(i!=null)dropLot(+i)});
 </script>
 </body>
 </html>
