@@ -293,6 +293,8 @@ main img{filter:brightness(1.08) saturate(1.12) contrast(1.02)}
 .rgn button.on{border-color:var(--accent);color:var(--accent);font-weight:700}
 .list[data-show=in] .item.ab,.list[data-show=ab] .item:not(.ab){display:none}
 .topbar .appinst{display:none}
+.topbar button.adlink{background:none;border:0;padding:0;font:inherit;font-weight:700;cursor:pointer}
+.btn404{font:inherit;border:1px solid var(--accent);background:none;color:var(--accent);padding:6px 14px;border-radius:4px;cursor:pointer;margin-right:12px}
 @media (max-width:900px),(pointer:coarse){.topbar .appinst{display:inline}}
 .appguide{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:flex-end;justify-content:center;padding:16px}
 .appguide div{background:#fff;color:#141414;border-radius:10px;padding:18px 18px 14px;max-width:420px;width:100%;font-size:15px;line-height:1.6}

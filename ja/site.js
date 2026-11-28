@@ -68,7 +68,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var base=ad.getAttribute('href').replace(/ad\/?$/,'');
   var T='<span class="ml-ko">고객센터</span><span class="ml-ja">カスタマーセンター</span><span class="ml-zh">客服中心</span><span class="ml-en">Help Center</span>';
   var a=document.createElement('a');a.className='adlink';a.href=base+'help/';a.innerHTML=T;ad.parentNode.insertBefore(a,ad.nextSibling);
-  var f=document.querySelector('.foot .wrap');if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href=base+'help/';b.innerHTML=T;f.appendChild(b);}
+  var f=document.querySelector('.foot .wrap');if(f&&!f.querySelector('a[href$="help/"]')){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href=base+'help/';b.innerHTML=T;f.appendChild(b);}
 })();
 
 /* 261029 광고문의 화면에도 고객센터 왼쪽 메뉴 (ad/는 생성기가 다시 만들어서 여기서 넣음) */
@@ -202,10 +202,11 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   /* 위 띠 링크: 검색 · 기사제보 */
   var ad=document.querySelector('.topbar .adlink');
   if(ad){
-    var s=document.createElement('a');s.className='adlink cen-srch';s.href='#';s.innerHTML=ml('검색','検索','搜索','Search');ad.parentNode.insertBefore(s,ad);
+    var s=document.createElement('button');s.type='button';s.className='adlink cen-srch';s.innerHTML=ml('검색','検索','搜索','Search');ad.parentNode.insertBefore(s,ad);
     var t=document.createElement('a');t.className='adlink';t.href='https://docs.google.com/forms/d/e/1FAIpQLSfmD1UmAwErXru4BHybowZTTHaM6JYe-ZCpUG8xjVyhc6ycPQ/viewform';t.target='_blank';t.rel='noopener';t.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');ad.parentNode.insertBefore(t,ad);
     s.addEventListener('click',function(e){e.preventDefault();open()});
   }
+  document.querySelectorAll('[data-search]').forEach(function(b){b.addEventListener('click',open)});  /* 261128 404 쪽 '기사 검색' 버튼 */
   var f=document.querySelector('.foot .wrap');
   if(f){f.appendChild(document.createTextNode(' · '));var b=document.createElement('a');b.href='https://docs.google.com/forms/d/e/1FAIpQLSfmD1UmAwErXru4BHybowZTTHaM6JYe-ZCpUG8xjVyhc6ycPQ/viewform';b.target='_blank';b.rel='noopener';b.innerHTML=ml('기사제보','情報提供','新闻爆料','News Tips');f.appendChild(b)}
   /* 검색 창 */
@@ -230,7 +231,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('.acts [dat
   var nav=document.querySelector('nav.nav');
   if(nav&&document.querySelector('main .front')){
     var bar=document.createElement('div');bar.className='cen-tk';
-    bar.innerHTML='<div class="wrap"><b>'+ml('최신','最新','最新','Latest')+'</b><a href="#"></a></div>';  /* 오른쪽 날짜 뺌 — 위 띠 날짜와 겹침(261116 사용자) */
+    bar.innerHTML='<div class="wrap"><b>'+ml('최신','最新','最新','Latest')+'</b><a></a></div>';  /* 오른쪽 날짜 뺌 — 위 띠 날짜와 겹침(261116 사용자) */
     nav.parentNode.insertBefore(bar,nav.nextSibling);
     var a=bar.querySelector('a'),idx=0,tmr=0;
     db(function(d){var L=d.slice(0,10);if(!L.length){bar.remove();return}
